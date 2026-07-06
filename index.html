@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Space Explorer VR | Interactive Solar System</title>
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Roboto', sans-serif;
+      background: #000;
+    }
+
+    /* ========== HEADER ========== */
+    #header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(135deg, rgba(15,32,64,0.98) 0%, rgba(25,45,80,0.98) 100%);
+      border-bottom: 2px solid rgba(79,195,247,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 25px;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Orbitron', sans-serif;
+      color: #4fc3f7;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .logo span {
+      font-size: 24px;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      max-width: 70%;
+      justify-content: flex-start;
+    }
+
+    .nav-btn {
+      background: linear-gradient(135deg, rgba(79,195,247,0.15), rgba(63,81,181,0.15));
+      color: #e0e0e0;
+      border: 1.5px solid rgba(79,195,247,0.4);
+      border-radius: 8px;
+      padding: 7px 13px;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Roboto', sans-serif;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .nav-btn:hover {
+      background: linear-gradient(135deg, rgba(79,195,247,0.35), rgba(63,81,181,0.35));
+      border-color: rgba(79,195,247,0.8);
+      box-shadow: 0 0 12px rgba(79,195,247,0.3);
+      transform: translateY(-2px);
+    }
+
+    .nav-btn.active {
+      background: linear-gradient(135deg, #4fc3f7, #29b6f6);
+      border-color: #4fc3f7;
+      color: #001a33;
+      font-weight: 600;
+      box-shadow: 0 0 15px rgba(79,195,247,0.5);
+    }
+
+    /* ========== SPEED CONTROL ========== */
+    #speedControl {
+      position: fixed;
+      top: 75px;
+      right: 20px;
+      background: linear-gradient(135deg, rgba(15,32,64,0.95), rgba(25,45,80,0.95));
+      border: 1.5px solid rgba(79,195,247,0.4);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 12px;
+      color: #e0e0e0;
+      z-index: 999;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    #speedControl button {
+      background: rgba(79,195,247,0.2);
+      color: #4fc3f7;
+      border: 1px solid rgba(79,195,247,0.5);
+      border-radius: 6px;
+      padding: 4px 9px;
+      margin: 0 5px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    #speedControl button:hover {
+      background: rgba(79,195,247,0.4);
+      box-shadow: 0 0 8px rgba(79,195,247,0.4);
+    }
+
+    #speedNum {
+      color: #4fc3f7;
+      font-weight: 600;
+      font-family: 'Orbitron', sans-serif;
+      min-width: 35px;
+      text-align: center;
+      display: inline-block;
+    }
+
+    /* ========== INFO PANEL ========== */
+    #info {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 380px;
+      background: linear-gradient(135deg, rgba(15,32,64,0.97), rgba(25,45,80,0.97));
+      border: 1.5px solid rgba(79,195,247,0.5);
+      border-radius: 12px;
+      padding: 20px;
+      color: #e0e0e0;
+      z-index: 999;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+      max-height: 30vh;
+      overflow-y: auto;
+      backdrop-filter: blur(10px);
+    }
+
+    #info::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #info::-webkit-scrollbar-track {
+      background: rgba(79,195,247,0.1);
+      border-radius: 10px;
+    }
+
+    #info::-webkit-scrollbar-thumb {
+      background: rgba(79,195,247,0.4);
+      border-radius: 10px;
+    }
+
+    #info::-webkit-scrollbar-thumb:hover {
+      background: rgba(79,195,247,0.6);
+    }
+
+    #info h3 {
+      color: #4fc3f7;
+      margin: 0 0 10px 0;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    #info p {
+      margin: 0 0 8px 0;
+      line-height: 1.6;
+      font-size: 13px;
+      color: #b0bec5;
+    }
+
+    #info .stat {
+      background: rgba(79,195,247,0.1);
+      padding: 8px 12px;
+      border-left: 3px solid #4fc3f7;
+      margin: 8px 0;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #81d4fa;
+    }
+
+    /* ========== RIGHT SIDEBAR ========== */
+    #sidebar {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      width: 280px;
+      background: linear-gradient(135deg, rgba(15,32,64,0.97), rgba(25,45,80,0.97));
+      border: 1.5px solid rgba(79,195,247,0.5);
+      border-radius: 12px;
+      padding: 15px;
+      color: #e0e0e0;
+      z-index: 999;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+      font-size: 12px;
+      max-height: 30vh;
+      overflow-y: auto;
+    }
+
+    #sidebar h4 {
+      color: #4fc3f7;
+      font-size: 13px;
+      margin: 0 0 8px 0;
+      text-transform: uppercase;
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 0.5px;
+    }
+
+    #sidebar p {
+      margin: 6px 0;
+      line-height: 1.5;
+      color: #b0bec5;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 1200px) {
+      .nav-buttons {
+        max-width: 50%;
+      }
+      
+      #info, #sidebar {
+        width: 320px;
+        font-size: 11px;
+      }
+
+      #info h3 {
+        font-size: 16px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      #header {
+        height: 50px;
+        padding: 0 15px;
+      }
+
+      .logo {
+        font-size: 14px;
+      }
+
+      .nav-btn {
+        padding: 5px 10px;
+        font-size: 10px;
+      }
+
+      .nav-buttons {
+        max-width: 45%;
+      }
+
+      #info, #sidebar {
+        width: 250px;
+        font-size: 11px;
+        padding: 12px;
+        bottom: 10px;
+        left: 10px;
+        right: auto;
+      }
+
+      #sidebar {
+        left: auto;
+        right: 10px;
+        bottom: 10px;
+        width: 250px;
+      }
+
+      #speedControl {
+        top: 60px;
+        right: 10px;
+        font-size: 11px;
+        padding: 8px 10px;
+      }
+    }
+
+    /* ========== LOADING/STATUS ========== */
+    #status {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.9);
+      color: #4fc3f7;
+      padding: 20px 40px;
+      border-radius: 10px;
+      font-family: 'Orbitron', sans-serif;
+      z-index: 2000;
+      display: none;
+      text-align: center;
+    }
+
+    /* ========== VIGNETTE EFFECT ========== */
+    #vignette {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%);
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div id="header">
+  <div class="logo">
+    <span>🚀</span>
+    <span>Space Explorer VR</span>
+  </div>
+  <div class="nav-buttons">
+    <button class="nav-btn active" onclick="setLesson(0)">🌌 Solar System</button>
+    <button class="nav-btn" onclick="setLesson(1)">① Orbits</button>
+    <button class="nav-btn" onclick="setLesson(2)">② Day & Night</button>
+    <button class="nav-btn" onclick="setLesson(3)">③ Seasons</button>
+    <button class="nav-btn" onclick="setLesson(4)">④ Phases</button>
+    <button class="nav-btn" onclick="setLesson(5)">⑤ Tides</button>
+    <button class="nav-btn" onclick="setLesson(6)">⑥ Eclipses</button>
+  </div>
+</div>
+
+<!-- Speed Control -->
+<div id="speedControl">
+  <strong>Orbit Speed:</strong> 
+  <button onclick="changeSpeed(-0.3)">−</button>
+  <span id="speedNum">1.0x</span>
+  <button onclick="changeSpeed(0.3)">+</button>
+</div>
+
+<!-- Info Panel (Left) -->
+<div id="info">
+  <h3 id="title">🌌 The Whole Solar System</h3>
+  <p id="description">Welcome! You're viewing the eight planets orbiting our Sun. Use <strong>WASD</strong> to fly around. Click any planet for detailed information.</p>
+  <div id="extraInfo"></div>
+</div>
+
+<!-- Sidebar (Right) -->
+<div id="sidebar">
+  <h4>📚 How to Use</h4>
+  <p><strong>Desktop:</strong> WASD to fly, drag to look around, click planets</p>
+  <p><strong>Quest 3S:</strong> Tap "Enter VR", point & trigger to click</p>
+  <p><strong>Speed Control:</strong> Use −/+ buttons to slow down or speed up orbits</p>
+  <p style="margin-top: 12px; color: #4fc3f7;"><strong>Pro Tip:</strong> Get close to planets to see their details!</p>
+</div>
+
+<!-- Vignette Effect -->
+<div id="vignette"></div>
+
+<!-- A-Frame Scene -->
+<a-scene background="color: #000008" fog="type: linear; color: #000008; near: 0.1; far: 120">
+  
+  <!-- Camera -->
+  <a-entity id="camera" camera position="0 3 20" wasd-controls look-controls>
+    <a-cursor color="#4fc3f7" fuse="false"></a-cursor>
+  </a-entity>
+
+  <!-- Lighting -->
+  <a-light type="ambient" color="#fff" intensity="0.4"></a-light>
+  <a-light type="point" color="#fff" intensity="1.4" position="0 0 0"></a-light>
+  <a-light type="point" color="#4fc3f7" intensity="0.3" position="20 20 20"></a-light>
+
+  <!-- Starfield -->
+  <a-entity id="starfield"></a-entity>
+
+  <!-- Solar System -->
+  <a-entity id="solarsystem" position="0 2 0">
+    
+    <!-- ===== SUN ===== -->
+    <a-sphere id="sun" radius="1" color="#FFA500" 
+               position="0 0 0" 
+               material="emissive: #FF8800; emissiveIntensity: 0.9; metalness: 0.3"
+               class="celestial" 
+               segments-height="64" segments-width="64"
+               data-name="The Sun" 
+               data-info="The Sun is a massive ball of hot gas held together by gravity. It contains 99.8% of all mass in the solar system. Its core temperature reaches 15 million degrees Celsius! It's been shining for 4.6 billion years and will continue for another 5 billion years.">
+    </a-sphere>
+
+    <!-- ===== MERCURY ===== -->
+    <a-entity id="mercury-orbit" position="0 0 0" rotation="0 0 0">
+      <a-sphere id="mercury" radius="0.08" color="#8B7355" 
+                 position="2.2 0 0" 
+                 material="metalness: 0.6; roughness: 0.8"
+                 class="celestial"
+                 segments-height="32" segments-width="32"
+                 data-name="Mercury" 
+                 data-info="Mercury is the smallest planet and closest to the Sun. It has extreme temperature swings: 430°C in sunlight, -180°C at night. A day on Mercury is longer than its year! It has virtually no atmosphere.">
+      </a-sphere>
+      <a-torus radius="2.2" radius-tubular="0.015" rotation="90 0 0" color="#4fc3f7" material="opacity: 0.25; transparent: true"></a-torus>
+    </a-entity>
+
+    <!-- ===== VENUS ===== -->
+    <a-entity id="venus-orbit" position="0 0 0" rotation="0 0 0">
+      <a-sphere id="venus" radius="0.14" color="#FFC649" 
+                 position="3.1 0 0" 
+                 material="metalness: 0.5; roughness: 0.7; emissiveIntensity: 0.2"
+                 class="celestial"
+                 segments-height="32" segments-width="32"
+                 data-name="Venus" 
+                 data-info="Venus is the hottest planet at 465°C, even hotter than Mercury! Its thick atmosphere is made of sulfuric acid clouds. Venus rotates backwards compared to most planets. It's so bright we can see it from Earth without a telescope.">
+      </a-sphere>
+      <a-torus radius="3.1" radius-tubular="0.015" rotation="90 0 0" color="#4fc3f7" material="opacity: 0.25; transparent: true"></a-torus>
+    </a-entity>
+
+    <!-- ===== EARTH ===== -->
+    <a-entity id="earth-orbit" position="0 0 0" rotation="0 0 0">
+      <a-sphere id="earth" radius="0.15" color="#1E90FF" 
+                 position="3.8 0 0" 
+                 material="metalness: 0.3; roughness: 0.9; map: #earthTex; emissiveIntensity: 0.15"
+                 class="celestial"
+                 segments-height="64" segments-width="64"
+                 data-name="Earth" 
+                 data-info="Earth is our home! It's the only planet we know of with life. Our atmosphere protects us from radiation. Liquid water covers 71% of the surface. It takes 365.25 days to orbit the Sun and 24 hours to rotate.">
+      </a-sphere>
+      
+      <!-- Moon -->
+      <a-entity id="moon-orbit" position="3.8 0 0" rotation="0 0 0">
+        <a-sphere id="moon" radius="0.05" color="#C0C0C0" 
+                   position="0.5 0 0" 
+                   material="metalness: 0.4; roughness: 0.9"
+                   class="celestial"
+                   segments-height="32" segments-width="32"
+                   data-name="The Moon" 
+                   data-info="The Moon is Earth's natural satellite. It's 384,400 km away and orbits Earth every 27.3 days. It's responsible for our tides. The same side always faces Earth because its rotation matches its orbit.">
+        </a-sphere>
+      </a-entity>
+
+      <a-torus radius="3.8" radius-tubular="0.015" rotation="90 0 0" color="#4fc3f7" material="opacity: 0.3; transparent: true"></a-torus>
+    </a-entity>
+
+    <!-- ===== MARS ===== -->
+    <a-entity id="mars-orbit" position="0 0 0" rotation="0 0 0">
+      <a-sphere id="mars" radius="0.1" color="#C1440E" 
+                 position="4.9 0 0" 
+                 material="metalness: 0.3; roughness: 0.85"
+                 class="celestial"
+                 segments-height="32" segments-width="32"
+                 data-name="Mars" 
+                 data-info="Mars is the Red Planet! Its rusty surface is due to iron oxide. It has two small moons: Phobos and Deimos. A day on Mars is 24.6 hours, similar to Earth. Scientists believe it once had liquid water.">
+      </a-sphere>
+      <a-torus radius="4.9" radius-tubular="0.015" rotation="90 0 0" color="#4fc3f7" material="opacity: 0.25; transparent: true"></a-torus>
+    </a-entity>
+
+    <!-- ===== JUPITER ===== -->
+    <a-entity id="jupiter-orbit" position="0 0 0" rotation="0 0 0">
+      <a-sphere id="jupiter" radius="0.45" color="#D9A066" 
+                 position="6.8 0 0" 
+                 material="metalness: 0.2; roughness: 0.8; emissiveIntensity: 0.1"
+                 class="celestial"
+                 segments-height="64" segments-width="64"
+                 data-name="Jupiter" 
+                 data-info="Jupiter is the largest planet! You could fit 1,300+ Earths inside it. It's a gas giant with no solid surface. The Great Red Spot is a storm larger than Earth that has raged for 300+ years. It has 79+ moons!">
+      </a-sphere>
+      <a-torus radius="6.8" radius-tubular="0.015" rotation="90 0 0" color="#4fc3f7" material="opacity: 0.25; transparent: true"></a-torus>
+    </a-entity>
+
+    <!-- ===== SATURN ===== -->
+    <a-entity id="saturn-orbit" position="0 0 0" rotation="0 0 0">
+      <a-entity position="8.2 0 0">
+        <a-sphere id="saturn" radius="0.38" color="#E3C16F" 
+                   material="metalness: 0.2; roughness: 0.85; emissiveIntensity: 0.1"
+                   class="celestial"
+                   segments-height="64" segments-width="64"
+                   data-name="Saturn" 
+                   data-info="Saturn is famous for its beautiful rings made of billions of pieces of ice and rock. It's a gas giant with 82 known moons. Its largest moon, Titan, has an atmosphere and liquid methane oceans.">
+        </a-sphere>
+        <!-- Saturn Rings with gradient -->
+        <a-torus radius="0.7" radius-tubular="0.065" rotation="75 0 0" color="#F4E4A8" material="opacity: 0.85; transparent: true; side: double; metalness: 0.4"></a-torus>
+      </a-entity>
+      <a-torus radius="8.2" radius-tubular="0.015" rotation="90 0 0" color="#4fc3f7" material="opacity: 0.25; transparent: true"></a-torus>
+    </a-entity>
+
+    <!-- ===== URANUS ===== -->
+    <a-entity id="uranus-orbit" position="0 0 0" rotation="0 0 0">
+      <a-sphere id="uranus" radius="0.28" color="#7DE3E1" 
+                 position="9.5 0 0" 
+                 material="metalness: 0.15; roughness: 0.9; emissiveIntensity: 0.1"
+                 class="celestial"
+                 segments-height="32" segments-width="32"
+                 data-name="Uranus" 
+                 data-info="Uranus is an ice giant that spins on its side! Its axis is tilted 98 degrees, probably from an ancient collision. It appears as a featureless blue-green sphere. It has 27 known moons and a faint ring system.">
+      </a-sphere>
+      <a-torus radius="9.5" radius-tubular="0.015" rotation="90 0 0" color="#4fc3f7" material="opacity: 0.25; transparent: true"></a-torus>
+    </a-entity>
+
+    <!-- ===== NEPTUNE ===== -->
+    <a-entity id="neptune-orbit" position="0 0 0" rotation="0 0 0">
+      <a-sphere id="neptune" radius="0.27" color="#3D5AFE" 
+                 position="10.8 0 0" 
+                 material="metalness: 0.15; roughness: 0.9; emissiveIntensity: 0.1"
+                 class="celestial"
+                 segments-height="32" segments-width="32"
+                 data-name="Neptune" 
+                 data-info="Neptune is the windiest planet with speeds over 2,100 km/h! It's an ice giant with 14 known moons. The Great Dark Spot was a storm system larger than Earth that mysteriously disappeared.">
+      </a-sphere>
+      <a-torus radius="10.8" radius-tubular="0.015" rotation="90 0 0" color="#4fc3f7" material="opacity: 0.25; transparent: true"></a-torus>
+    </a-entity>
+
+  </a-entity>
+
+  <!-- Floor -->
+  <a-plane rotation="-90 0 0" width="80" height="80" position="0 -2 0" color="#0a0a1a"></a-plane>
+
+</a-scene>
+
+<script>
+  // ===== STARFIELD GENERATION =====
+  function generateStars() {
+    const starfield = document.querySelector('#starfield');
+    let starHTML = '';
+    for (let i = 0; i < 500; i++) {
+      const x = (Math.random() - 0.5) * 150;
+      const y = (Math.random() - 0.5) * 150;
+      const z = (Math.random() - 0.5) * 150;
+      const size = (Math.random() * 0.15 + 0.03).toFixed(2);
+      const opacity = (Math.random() * 0.6 + 0.4).toFixed(2);
+      starHTML += `<a-sphere position="${x.toFixed(1)} ${y.toFixed(1)} ${z.toFixed(1)}" radius="${size}" color="#ffffff" material="opacity: ${opacity}; transparent: true"></a-sphere>`;
+    }
+    starfield.innerHTML = starHTML;
+  }
+
+  generateStars();
+
+  // ===== STATE =====
+  let currentLesson = 0;
+  let speed = 1;
+  let angles = {
+    mercury: 0, venus: 0, earth: 0, mars: 0,
+    jupiter: 0, saturn: 0, uranus: 0, neptune: 0, moon: 0
+  };
+
+  const speeds = {
+    mercury: 4.1, venus: 1.6, earth: 1, mars: 0.53,
+    jupiter: 0.084, saturn: 0.034, uranus: 0.012, neptune: 0.006,
+    moon: 13
+  };
+
+  const lessons = {
+    0: { 
+      title: "🌌 The Whole Solar System", 
+      desc: "Welcome! You're viewing the eight planets orbiting our Sun. Use <strong>WASD</strong> to fly around. Click any planet for detailed information. Notice how closer planets orbit faster!" 
+    },
+    1: { 
+      title: "① Lesson: How Orbits Work", 
+      desc: "All planets orbit the Sun in elliptical paths. Planets closer to the Sun orbit faster, while distant planets move slowly. Mercury completes an orbit in 88 days, while Neptune takes 165 years!" 
+    },
+    2: { 
+      title: "② Lesson: Day and Night", 
+      desc: "As Earth spins on its axis, one side faces the Sun (day) while the other is dark (night). One complete rotation takes 24 hours. This is why we have day and night cycles every 24 hours." 
+    },
+    3: { 
+      title: "③ Lesson: Seasons", 
+      desc: "Earth's axis is tilted 23.5° relative to its orbit. As Earth orbits the Sun, different hemispheres receive more or less direct sunlight, creating seasonal changes in temperature and weather." 
+    },
+    4: { 
+      title: "④ Lesson: Moon Phases", 
+      desc: "As the Moon orbits Earth, we see different amounts of its sunlit side. The Moon doesn't create its own light—it reflects sunlight. The cycle from new Moon to full Moon takes about 29.5 days." 
+    },
+    5: { 
+      title: "⑤ Lesson: Tides", 
+      desc: "The Moon's gravity pulls on Earth's oceans, creating bulges on the side facing the Moon and the opposite side. These bulges create high and low tides that cycle twice daily." 
+    },
+    6: { 
+      title: "⑥ Lesson: Eclipses", 
+      desc: "A solar eclipse occurs when the Moon passes directly between the Sun and Earth, blocking the Sun's light. A lunar eclipse occurs when Earth passes between the Sun and Moon, causing Earth's shadow on the Moon." 
+    }
+  };
+
+  function setLesson(n) {
+    currentLesson = n;
+    const lesson = lessons[n];
+    document.querySelector('#title').innerHTML = lesson.title;
+    document.querySelector('#description').innerHTML = lesson.desc;
+    document.querySelectorAll('.nav-btn').forEach((b, i) => {
+      b.classList.toggle('active', i === n);
+    });
+    document.querySelector('#extraInfo').innerHTML = '';
+  }
+
+  function changeSpeed(delta) {
+    speed = Math.max(0.1, Math.min(3, speed + delta));
+    document.querySelector('#speedNum').textContent = speed.toFixed(1) + 'x';
+  }
+
+  // ===== CLICK HANDLERS =====
+  document.querySelectorAll('.celestial').forEach(el => {
+    el.addEventListener('click', (e) => {
+      const name = el.getAttribute('data-name');
+      const info = el.getAttribute('data-info');
+      document.querySelector('#title').innerHTML = '🪐 ' + name;
+      document.querySelector('#description').innerHTML = info;
+      document.querySelector('#extraInfo').innerHTML = '';
+    });
+  });
+
+  // ===== ANIMATION LOOP =====
+  function animate() {
+    requestAnimationFrame(animate);
+
+    // Rotate all orbits
+    Object.keys(angles).forEach(key => {
+      if (key === 'moon') return;
+      const orbitEl = document.querySelector(`#${key}-orbit`);
+      if (orbitEl) {
+        angles[key] += (speeds[key] * 0.02 * speed);
+        orbitEl.setAttribute('rotation', `0 ${angles[key]} 0`);
+      }
+    });
+
+    // Moon orbit
+    const moonOrbit = document.querySelector('#moon-orbit');
+    if (moonOrbit) {
+      angles.moon += (speeds.moon * 0.02 * speed);
+      moonOrbit.setAttribute('rotation', `0 ${angles.moon} 0`);
+    }
+
+    // Planet rotation
+    document.querySelectorAll('.celestial').forEach(el => {
+      const spin = (parseFloat(el.getAttribute('data-spin')) || 0) + (0.5 * speed);
+      el.setAttribute('data-spin', spin);
+      el.setAttribute('rotation', `0 ${spin} 0`);
+    });
+  }
+
+  animate();
+  setLesson(0);
+</script>
+
+</body>
+</html>
