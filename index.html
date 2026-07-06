@@ -5,75 +5,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Space Explorer VR | Interactive Solar System</title>
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Roboto', sans-serif; background: #000; }
-
     #header {
       position: fixed; top: 0; left: 0; right: 0; height: 60px;
-      background: linear-gradient(135deg, rgba(15,32,64,0.98) 0%, rgba(25,45,80,0.98) 100%);
+      background: linear-gradient(135deg, rgba(15,32,64,0.98), rgba(25,45,80,0.98));
       border-bottom: 2px solid rgba(79,195,247,0.5);
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 25px; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+      padding: 0 25px; z-index: 1000;
     }
-    .logo {
-      display: flex; align-items: center; gap: 12px;
-      font-family: 'Orbitron', sans-serif; color: #4fc3f7;
-      font-size: 18px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-    }
-    .logo span { font-size: 24px; }
+    .logo { display: flex; align-items: center; gap: 12px; font-family: 'Orbitron', sans-serif; color: #4fc3f7; font-size: 18px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
     .nav-buttons { display: flex; gap: 6px; flex-wrap: wrap; max-width: 70%; }
     .nav-btn {
-      background: linear-gradient(135deg, rgba(79,195,247,0.15), rgba(63,81,181,0.15));
-      color: #e0e0e0; border: 1.5px solid rgba(79,195,247,0.4); border-radius: 8px;
-      padding: 7px 13px; font-size: 11px; font-weight: 500; cursor: pointer;
-      transition: all 0.3s ease; letter-spacing: 0.5px; white-space: nowrap;
+      background: rgba(79,195,247,0.15); color: #e0e0e0;
+      border: 1.5px solid rgba(79,195,247,0.4); border-radius: 8px;
+      padding: 7px 13px; font-size: 11px; cursor: pointer; white-space: nowrap; transition: 0.2s;
     }
-    .nav-btn:hover {
-      background: linear-gradient(135deg, rgba(79,195,247,0.35), rgba(63,81,181,0.35));
-      border-color: rgba(79,195,247,0.8); box-shadow: 0 0 12px rgba(79,195,247,0.3);
-    }
-    .nav-btn.active {
-      background: linear-gradient(135deg, #4fc3f7, #29b6f6);
-      border-color: #4fc3f7; color: #001a33; font-weight: 600;
-      box-shadow: 0 0 15px rgba(79,195,247,0.5);
-    }
-
+    .nav-btn:hover { background: rgba(79,195,247,0.35); }
+    .nav-btn.active { background: #4fc3f7; color: #001a33; font-weight: 600; }
     #speedControl {
       position: fixed; top: 75px; right: 20px;
-      background: linear-gradient(135deg, rgba(15,32,64,0.95), rgba(25,45,80,0.95));
-      border: 1.5px solid rgba(79,195,247,0.4); border-radius: 12px;
-      padding: 12px 16px; font-size: 12px; color: #e0e0e0; z-index: 999;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5); font-weight: 500;
+      background: rgba(15,32,64,0.95); border: 1.5px solid rgba(79,195,247,0.4);
+      border-radius: 12px; padding: 12px 16px; font-size: 12px; color: #e0e0e0; z-index: 999;
     }
     #speedControl button {
-      background: rgba(79,195,247,0.2); color: #4fc3f7;
-      border: 1px solid rgba(79,195,247,0.5); border-radius: 6px;
-      padding: 4px 9px; margin: 0 5px; font-size: 12px; font-weight: 600; cursor: pointer;
+      background: rgba(79,195,247,0.2); color: #4fc3f7; border: 1px solid rgba(79,195,247,0.5);
+      border-radius: 6px; padding: 4px 9px; margin: 0 5px; font-size: 12px; cursor: pointer;
     }
-    #speedNum { color: #4fc3f7; font-weight: 600; font-family: 'Orbitron', sans-serif; min-width: 35px; text-align: center; display: inline-block; }
-
+    #speedNum { color: #4fc3f7; font-weight: 600; font-family: 'Orbitron', sans-serif; }
     #info {
       position: fixed; bottom: 20px; left: 20px; width: 380px;
-      background: linear-gradient(135deg, rgba(15,32,64,0.97), rgba(25,45,80,0.97));
-      border: 1.5px solid rgba(79,195,247,0.5); border-radius: 12px;
-      padding: 20px; color: #e0e0e0; z-index: 999;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.7); max-height: 30vh; overflow-y: auto;
+      background: rgba(15,32,64,0.97); border: 1.5px solid rgba(79,195,247,0.5);
+      border-radius: 12px; padding: 20px; color: #e0e0e0; z-index: 999; max-height: 30vh; overflow-y: auto;
     }
-    #info h3 { color: #4fc3f7; margin: 0 0 10px 0; font-size: 18px; font-weight: 600; text-transform: uppercase; font-family: 'Orbitron', sans-serif; }
+    #info h3 { color: #4fc3f7; margin: 0 0 10px 0; font-size: 17px; font-family: 'Orbitron', sans-serif; text-transform: uppercase; }
     #info p { margin: 0 0 8px 0; line-height: 1.6; font-size: 13px; color: #b0bec5; }
-
     #sidebar {
       position: fixed; right: 20px; bottom: 20px; width: 280px;
-      background: linear-gradient(135deg, rgba(15,32,64,0.97), rgba(25,45,80,0.97));
-      border: 1.5px solid rgba(79,195,247,0.5); border-radius: 12px;
-      padding: 15px; color: #e0e0e0; z-index: 999; font-size: 12px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.7); max-height: 30vh; overflow-y: auto;
+      background: rgba(15,32,64,0.97); border: 1.5px solid rgba(79,195,247,0.5);
+      border-radius: 12px; padding: 15px; color: #e0e0e0; z-index: 999; font-size: 12px; max-height: 30vh; overflow-y: auto;
     }
-    #sidebar h4 { color: #4fc3f7; font-size: 13px; margin: 0 0 8px 0; text-transform: uppercase; font-family: 'Orbitron', sans-serif; }
+    #sidebar h4 { color: #4fc3f7; font-size: 13px; margin: 0 0 8px 0; font-family: 'Orbitron', sans-serif; text-transform: uppercase; }
     #sidebar p { margin: 6px 0; line-height: 1.5; color: #b0bec5; }
-
     @media (max-width: 768px) {
       #header { height: auto; padding: 8px 10px; flex-direction: column; gap: 6px; }
       .nav-buttons { max-width: 100%; justify-content: center; }
@@ -106,19 +81,19 @@
 
 <div id="info">
   <h3 id="title">🌌 The Whole Solar System</h3>
-  <p id="description">Welcome! Use <strong>WASD</strong> to fly (desktop) or the <strong>left joystick</strong> in VR. Click planets for facts. In VR, point the laser and pull the trigger.</p>
+  <p id="description">Point at any planet (hover or laser) to see its name. Click / pull trigger for full facts. Left joystick = fly, right joystick = turn.</p>
 </div>
 
 <div id="sidebar">
   <h4>📚 How to Use</h4>
-  <p><strong>Desktop:</strong> WASD to fly, drag to look, click planets</p>
-  <p><strong>Quest 3S:</strong> Left joystick = move, right joystick = turn, point laser + trigger = click planets & menu</p>
-  <p style="margin-top: 12px; color: #4fc3f7;"><strong>In VR:</strong> the floating menu panel on your left has all the lesson buttons!</p>
+  <p><strong>Desktop:</strong> WASD fly, drag look, hover & click planets</p>
+  <p><strong>Quest 3S:</strong> Left stick move • Right stick turn • Laser + trigger to click</p>
+  <p style="color:#4fc3f7"><strong>New:</strong> planets now have moons, shadows & textures. Point the laser at a planet to see its name pop up!</p>
 </div>
 
-<a-scene background="color: #000008">
+<a-scene background="color: #000008" renderer="antialias: true; colorManagement: true" shadow="type: pcfsoft">
 
-  <!-- ============ CAMERA RIG with VR locomotion ============ -->
+  <!-- ============ CAMERA RIG ============ -->
   <a-entity id="rig" position="0 2 11" thumbstick-locomotion>
     <a-entity id="head" camera position="0 1.6 0" look-controls wasd-controls="acceleration: 40">
       <a-cursor color="#4fc3f7" fuse="false" raycaster="objects: .celestial, .vrbtn"></a-cursor>
@@ -127,189 +102,401 @@
     <a-entity id="rightHand" laser-controls="hand: right" raycaster="objects: .celestial, .vrbtn; far: 60" line="color: #4fc3f7; opacity: 0.8"></a-entity>
   </a-entity>
 
-  <!-- Lighting -->
-  <a-light type="ambient" color="#fff" intensity="0.45"></a-light>
-  <a-light type="point" color="#fff" intensity="1.5" position="0 2 0"></a-light>
+  <!-- ============ LIGHTING: sun is the only strong light => real day/night shading ============ -->
+  <a-light type="ambient" color="#fff" intensity="0.13"></a-light>
+  <a-light id="sunLight" type="point" color="#fff8e7" intensity="2.2" distance="120" decay="0.4"
+           position="0 3 0" light="castShadow: true; shadowMapWidth: 1024; shadowMapHeight: 1024; shadowCameraFar: 60"></a-light>
 
-  <!-- Starfield -->
   <a-entity id="starfield"></a-entity>
 
-  <!-- ============ IN-VR LESSON MENU PANEL ============ -->
-  <!-- Positioned to the left of spawn point, always visible in VR -->
+  <!-- ============ IN-VR LESSON MENU ============ -->
   <a-entity id="vrMenu" position="-5.5 3.2 7" rotation="0 50 0" scale="0.75 0.75 0.75">
-    <a-plane width="5.4" height="7.4" color="#0f2040" opacity="0.92"
-             material="transparent: true; shader: flat"
-             position="0 0 -0.02"></a-plane>
-    <a-text value="LESSON MENU" color="#4fc3f7" align="center" width="7"
-            position="0 3.2 0" font="exo2bold"></a-text>
-
-    <!-- Buttons created by JS -->
+    <a-plane width="5.4" height="7.4" color="#0f2040" opacity="0.92" material="transparent: true; shader: flat" position="0 0 -0.02"></a-plane>
+    <a-text value="LESSON MENU" color="#4fc3f7" align="center" width="7" position="0 3.2 0"></a-text>
     <a-entity id="vrMenuButtons"></a-entity>
-
-    <a-text id="vrSpeedLabel" value="Orbit Speed: 1.0x" color="#ffca28" align="center" width="5"
-            position="0 -2.6 0"></a-text>
-    <a-plane class="vrbtn" data-action="speed-down" width="1" height="0.55" color="#263238"
-             position="-1.3 -3.2 0" material="shader: flat">
-      <a-text value="−" color="#4fc3f7" align="center" width="6" position="0 0 0.01"></a-text>
+    <a-text id="vrSpeedLabel" value="Orbit Speed: 1.0x" color="#ffca28" align="center" width="5" position="0 -2.6 0"></a-text>
+    <a-plane class="vrbtn" data-action="speed-down" width="1" height="0.55" color="#263238" position="-1.3 -3.2 0" material="shader: flat">
+      <a-text value="-" color="#4fc3f7" align="center" width="6" position="0 0 0.01"></a-text>
     </a-plane>
-    <a-plane class="vrbtn" data-action="speed-up" width="1" height="0.55" color="#263238"
-             position="1.3 -3.2 0" material="shader: flat">
+    <a-plane class="vrbtn" data-action="speed-up" width="1" height="0.55" color="#263238" position="1.3 -3.2 0" material="shader: flat">
       <a-text value="+" color="#4fc3f7" align="center" width="6" position="0 0 0.01"></a-text>
     </a-plane>
   </a-entity>
 
-  <!-- ============ IN-VR INFO BOARD (shows planet facts in VR) ============ -->
+  <!-- ============ IN-VR INFO BOARD ============ -->
   <a-entity id="vrInfoBoard" position="5.5 3.2 7" rotation="0 -50 0" scale="0.75 0.75 0.75">
     <a-plane width="7" height="5" color="#0f2040" opacity="0.92" material="transparent: true; shader: flat" position="0 0 -0.02"></a-plane>
     <a-text id="vrInfoTitle" value="THE SOLAR SYSTEM" color="#4fc3f7" align="center" width="9" position="0 1.9 0"></a-text>
-    <a-text id="vrInfoBody" value="Point your laser at any planet and pull the trigger to learn about it. Use the left joystick to fly around!" color="#e0e0e0" align="center"
-            width="6" wrap-count="38" position="0 -0.3 0"></a-text>
+    <a-text id="vrInfoBody" value="Point the laser at a planet to see its name. Pull the trigger for full facts!" color="#e0e0e0" align="center" width="6" wrap-count="38" position="0 -0.3 0"></a-text>
   </a-entity>
 
-  <!-- ============ SOLAR SYSTEM ============ -->
-  <!-- SIZE ORDER (radius): Sun 2.6 > Jupiter 0.9 > Saturn 0.75 > Uranus 0.42 > Neptune 0.4 > Earth 0.24 > Venus 0.22 > Mars 0.16 > Mercury 0.11 > Moon 0.07 -->
-  <a-entity id="solarsystem" position="0 3 0">
-
-    <!-- SUN: biggest body by far -->
-    <a-sphere id="sun" radius="2.6" color="#FFA500"
-               position="0 0 0"
-               material="emissive: #FF8800; emissiveIntensity: 0.9; shader: standard"
-               class="celestial" segments-height="48" segments-width="48"
-               data-name="The Sun"
-               data-info="The Sun is a giant ball of burning gas. It holds 99.8% of all mass in the solar system and could fit 1.3 million Earths inside! Its core reaches 15 million degrees Celsius.">
-    </a-sphere>
-    <!-- Glow halo around sun -->
-    <a-sphere radius="2.9" color="#FF9900" material="transparent: true; opacity: 0.15; shader: flat" position="0 0 0"></a-sphere>
-
-    <!-- MERCURY -->
-    <a-entity id="mercury-orbit">
-      <a-sphere id="mercury" radius="0.11" color="#8B7355"
-                 position="4.2 0 0" material="roughness: 0.9"
-                 class="celestial" segments-height="24" segments-width="24"
-                 data-name="Mercury"
-                 data-info="Smallest planet, closest to the Sun. 430 C by day, -180 C at night. A day on Mercury lasts longer than its year!">
-      </a-sphere>
-      <a-torus radius="4.2" radius-tubular="0.015" rotation="90 0 0" color="#4fc3f7" material="opacity: 0.22; transparent: true; shader: flat"></a-torus>
-    </a-entity>
-
-    <!-- VENUS -->
-    <a-entity id="venus-orbit">
-      <a-sphere id="venus" radius="0.22" color="#FFC649"
-                 position="5.6 0 0" material="roughness: 0.7"
-                 class="celestial" segments-height="24" segments-width="24"
-                 data-name="Venus"
-                 data-info="Hottest planet at 465 C! Covered in thick clouds of sulfuric acid. It spins backwards compared to most planets.">
-      </a-sphere>
-      <a-torus radius="5.6" radius-tubular="0.015" rotation="90 0 0" color="#4fc3f7" material="opacity: 0.22; transparent: true; shader: flat"></a-torus>
-    </a-entity>
-
-    <!-- EARTH + MOON -->
-    <a-entity id="earth-orbit">
-      <a-sphere id="earth" radius="0.24" color="#1E90FF"
-                 position="7.2 0 0" material="roughness: 0.8"
-                 class="celestial" segments-height="32" segments-width="32"
-                 data-name="Earth"
-                 data-info="Our home! The only planet we know with life. 71% of the surface is water. One orbit around the Sun = 365.25 days.">
-      </a-sphere>
-      <a-entity id="moon-orbit" position="7.2 0 0">
-        <a-sphere id="moon" radius="0.07" color="#C0C0C0"
-                   position="0.75 0 0" material="roughness: 0.95"
-                   class="celestial" segments-height="20" segments-width="20"
-                   data-name="The Moon"
-                   data-info="Earth's natural satellite, 384,400 km away. It causes our ocean tides and always shows us the same face.">
-        </a-sphere>
-      </a-entity>
-      <a-torus radius="7.2" radius-tubular="0.015" rotation="90 0 0" color="#4fc3f7" material="opacity: 0.28; transparent: true; shader: flat"></a-torus>
-    </a-entity>
-
-    <!-- MARS -->
-    <a-entity id="mars-orbit">
-      <a-sphere id="mars" radius="0.16" color="#C1440E"
-                 position="8.9 0 0" material="roughness: 0.85"
-                 class="celestial" segments-height="24" segments-width="24"
-                 data-name="Mars"
-                 data-info="The Red Planet — rusty iron dust covers its surface. Home to the tallest volcano in the solar system: Olympus Mons, 3x taller than Everest!">
-      </a-sphere>
-      <a-torus radius="8.9" radius-tubular="0.015" rotation="90 0 0" color="#4fc3f7" material="opacity: 0.22; transparent: true; shader: flat"></a-torus>
-    </a-entity>
-
-    <!-- JUPITER: biggest PLANET but smaller than the Sun -->
-    <a-entity id="jupiter-orbit">
-      <a-sphere id="jupiter" radius="0.9" color="#D9A066"
-                 position="11.5 0 0" material="roughness: 0.75"
-                 class="celestial" segments-height="40" segments-width="40"
-                 data-name="Jupiter"
-                 data-info="The largest planet — 1,300 Earths could fit inside! Its Great Red Spot is a storm bigger than Earth that has raged for centuries.">
-      </a-sphere>
-      <a-torus radius="11.5" radius-tubular="0.015" rotation="90 0 0" color="#4fc3f7" material="opacity: 0.22; transparent: true; shader: flat"></a-torus>
-    </a-entity>
-
-    <!-- SATURN -->
-    <a-entity id="saturn-orbit">
-      <a-entity position="14.5 0 0">
-        <a-sphere id="saturn" radius="0.75" color="#E3C16F"
-                   material="roughness: 0.8"
-                   class="celestial" segments-height="40" segments-width="40"
-                   data-name="Saturn"
-                   data-info="Famous for its stunning rings made of billions of chunks of ice and rock. It has 82+ moons — its moon Titan even has rivers of liquid methane!">
-        </a-sphere>
-        <a-torus radius="1.35" radius-tubular="0.13" rotation="75 0 0" color="#F4E4A8" material="opacity: 0.8; transparent: true; side: double; shader: flat"></a-torus>
-      </a-entity>
-      <a-torus radius="14.5" radius-tubular="0.015" rotation="90 0 0" color="#4fc3f7" material="opacity: 0.22; transparent: true; shader: flat"></a-torus>
-    </a-entity>
-
-    <!-- URANUS -->
-    <a-entity id="uranus-orbit">
-      <a-sphere id="uranus" radius="0.42" color="#7DE3E1"
-                 position="17.2 0 0" material="roughness: 0.85"
-                 class="celestial" segments-height="28" segments-width="28"
-                 data-name="Uranus"
-                 data-info="An ice giant that spins on its side — tilted 98 degrees, probably from a giant ancient collision. It has 27 known moons.">
-      </a-sphere>
-      <a-torus radius="17.2" radius-tubular="0.015" rotation="90 0 0" color="#4fc3f7" material="opacity: 0.22; transparent: true; shader: flat"></a-torus>
-    </a-entity>
-
-    <!-- NEPTUNE -->
-    <a-entity id="neptune-orbit">
-      <a-sphere id="neptune" radius="0.4" color="#3D5AFE"
-                 position="19.5 0 0" material="roughness: 0.85"
-                 class="celestial" segments-height="28" segments-width="28"
-                 data-name="Neptune"
-                 data-info="The windiest planet — winds over 2,100 km/h! An ice giant so far away that one orbit around the Sun takes 165 Earth years.">
-      </a-sphere>
-      <a-torus radius="19.5" radius-tubular="0.015" rotation="90 0 0" color="#4fc3f7" material="opacity: 0.22; transparent: true; shader: flat"></a-torus>
-    </a-entity>
-
+  <!-- ============ FLOATING HOVER LABEL (follows pointed planet) ============ -->
+  <a-entity id="hoverLabel" visible="false">
+    <a-plane width="2.4" height="0.6" color="#0f2040" opacity="0.85" material="transparent: true; shader: flat"></a-plane>
+    <a-text id="hoverLabelText" value="" color="#ffca28" align="center" width="4" position="0 0 0.01"></a-text>
   </a-entity>
 
-  <!-- Floor -->
-  <a-plane rotation="-90 0 0" width="120" height="120" position="0 -2 0" color="#0a0a1a"></a-plane>
+  <!-- ============ SOLAR SYSTEM (planets & moons built by JS with canvas textures) ============ -->
+  <a-entity id="solarsystem" position="0 3 0"></a-entity>
+
+  <a-plane rotation="-90 0 0" width="120" height="120" position="0 -2 0" color="#0a0a1a" shadow="receive: true"></a-plane>
 
 </a-scene>
 
 <script>
-  // ===================================================================
-  // THUMBSTICK LOCOMOTION COMPONENT (VR joystick movement + snap turn)
-  // Left stick: move (head-relative). Right stick: snap turn 45°.
-  // ===================================================================
-  AFRAME.registerComponent('thumbstick-locomotion', {
-    init: function () {
-      this.moveX = 0;
-      this.moveY = 0;
-      this.snapReady = true;
-      const rig = this.el;
+// =====================================================================
+// PROCEDURAL TEXTURE GENERATOR — no external downloads, works offline
+// =====================================================================
+function makeTexture(kind) {
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 256;
+  const x = c.getContext('2d');
+  const W = c.width, H = c.height;
 
-      const bindStick = (handId, isLeft) => {
-        const hand = document.querySelector(handId);
-        if (!hand) return;
+  function noiseSpots(n, colors, rMin, rMax, alpha) {
+    for (let i = 0; i < n; i++) {
+      x.globalAlpha = alpha;
+      x.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+      const r = rMin + Math.random() * (rMax - rMin);
+      x.beginPath();
+      x.arc(Math.random() * W, Math.random() * H, r, 0, Math.PI * 2);
+      x.fill();
+    }
+    x.globalAlpha = 1;
+  }
+  function bands(colors, wobble) {
+    const bandH = H / colors.length;
+    colors.forEach((col, i) => {
+      x.fillStyle = col;
+      x.fillRect(0, i * bandH, W, bandH + 1);
+    });
+    // wobble the band edges with translucent streaks
+    for (let i = 0; i < 300; i++) {
+      x.globalAlpha = 0.08;
+      x.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+      const y = Math.random() * H;
+      x.fillRect(0, y, W, 2 + Math.random() * wobble);
+    }
+    x.globalAlpha = 1;
+  }
+
+  switch (kind) {
+    case 'sun':
+      x.fillStyle = '#FF9500'; x.fillRect(0, 0, W, H);
+      noiseSpots(240, ['#FFD54F', '#FFB300', '#FF7043', '#FFF176'], 4, 26, 0.35);
+      break;
+    case 'mercury':
+      x.fillStyle = '#8A7F73'; x.fillRect(0, 0, W, H);
+      noiseSpots(300, ['#6E655B', '#9C9184', '#5C534B', '#B0A697'], 2, 12, 0.5);
+      break;
+    case 'venus':
+      x.fillStyle = '#E6B87A'; x.fillRect(0, 0, W, H);
+      bands(['#E8C088', '#DFAE6C', '#F0CC96', '#D9A662', '#EABE80'], 8);
+      noiseSpots(60, ['#F5DCAE', '#CC9955'], 10, 40, 0.15);
+      break;
+    case 'earth':
+      x.fillStyle = '#1565C0'; x.fillRect(0, 0, W, H); // oceans
+      // continents
+      noiseSpots(26, ['#2E7D32', '#388E3C', '#6D4C41', '#4E6E31'], 18, 55, 0.95);
+      noiseSpots(50, ['#2E7D32', '#795548'], 6, 18, 0.8);
+      // clouds
+      noiseSpots(70, ['#FFFFFF'], 6, 22, 0.22);
+      // polar caps
+      x.fillStyle = '#FFFFFF'; x.globalAlpha = 0.9;
+      x.fillRect(0, 0, W, 16); x.fillRect(0, H - 16, W, 16);
+      x.globalAlpha = 1;
+      break;
+    case 'moon':
+      x.fillStyle = '#B8B8B8'; x.fillRect(0, 0, W, H);
+      noiseSpots(240, ['#9E9E9E', '#8C8C8C', '#CFCFCF', '#7A7A7A'], 2, 14, 0.55);
+      break;
+    case 'mars':
+      x.fillStyle = '#C1440E'; x.fillRect(0, 0, W, H);
+      noiseSpots(220, ['#A33A0C', '#D95F2B', '#8C3410', '#E07040'], 3, 18, 0.4);
+      x.fillStyle = '#FFFFFF'; x.globalAlpha = 0.85;
+      x.fillRect(0, 0, W, 10); x.fillRect(0, H - 10, W, 10);
+      x.globalAlpha = 1;
+      break;
+    case 'jupiter':
+      bands(['#D9A066', '#C68B4E', '#EEC188', '#B57841', '#E3AE72', '#C98F55', '#F0CC98', '#BC8047'], 10);
+      // great red spot
+      x.fillStyle = '#C0392B'; x.globalAlpha = 0.85;
+      x.beginPath(); x.ellipse(W * 0.7, H * 0.62, 34, 16, 0, 0, Math.PI * 2); x.fill();
+      x.globalAlpha = 1;
+      break;
+    case 'saturn':
+      bands(['#E8D5A3', '#DCC48C', '#F2E3B8', '#D0B87E', '#EAD9A8'], 6);
+      break;
+    case 'uranus':
+      x.fillStyle = '#7DE3E1'; x.fillRect(0, 0, W, H);
+      bands(['#7DE3E1', '#8FEAE8', '#6ED4D2', '#9FF0EE'], 4);
+      break;
+    case 'neptune':
+      x.fillStyle = '#3D5AFE'; x.fillRect(0, 0, W, H);
+      bands(['#3D5AFE', '#4A66FF', '#3050E8', '#5A74FF'], 5);
+      noiseSpots(8, ['#243FBF'], 12, 26, 0.5); // dark storms
+      break;
+    case 'ice':
+      x.fillStyle = '#D8D8E8'; x.fillRect(0, 0, W, H);
+      noiseSpots(180, ['#C0C0D8', '#EFEFF8', '#A8A8C4'], 2, 10, 0.5);
+      break;
+    case 'rock':
+      x.fillStyle = '#8D7B6C'; x.fillRect(0, 0, W, H);
+      noiseSpots(200, ['#75655A', '#A2907F', '#5F5248'], 2, 9, 0.5);
+      break;
+  }
+  return c.toDataURL();
+}
+
+// =====================================================================
+// DATA: planets + their major moons
+// moons: [name, radius, orbitRadius, orbitSpeed(deg/s), texture]
+// =====================================================================
+const PLANETS = [
+  { id: 'mercury', name: 'Mercury', tex: 'mercury', radius: 0.11, orbit: 4.2, speed: 4.1,
+    info: 'Smallest planet, closest to the Sun. 430 C by day, -180 C at night. It has NO moons at all!',
+    moons: [] },
+  { id: 'venus', name: 'Venus', tex: 'venus', radius: 0.22, orbit: 5.6, speed: 1.6,
+    info: 'Hottest planet at 465 C, wrapped in sulfuric acid clouds. Like Mercury, Venus has no moons.',
+    moons: [] },
+  { id: 'earth', name: 'Earth', tex: 'earth', radius: 0.24, orbit: 7.2, speed: 1,
+    info: 'Our home! 71% covered in water, the only known world with life. It has one moon: The Moon.',
+    moons: [ ['The Moon', 0.065, 0.55, 40, 'moon'] ] },
+  { id: 'mars', name: 'Mars', tex: 'mars', radius: 0.16, orbit: 8.9, speed: 0.53,
+    info: 'The Red Planet, covered in rusty dust. It has 2 tiny potato-shaped moons: Phobos and Deimos.',
+    moons: [ ['Phobos', 0.03, 0.32, 80, 'rock'], ['Deimos', 0.025, 0.48, 50, 'rock'] ] },
+  { id: 'jupiter', name: 'Jupiter', tex: 'jupiter', radius: 0.9, orbit: 11.5, speed: 0.084,
+    info: 'The largest planet with 79+ moons! Its 4 biggest (found by Galileo in 1610): Io, Europa, Ganymede & Callisto. Ganymede is bigger than Mercury!',
+    moons: [ ['Io', 0.05, 1.15, 70, 'rock'], ['Europa', 0.045, 1.4, 55, 'ice'], ['Ganymede', 0.07, 1.7, 40, 'ice'], ['Callisto', 0.06, 2.0, 30, 'rock'] ] },
+  { id: 'saturn', name: 'Saturn', tex: 'saturn', radius: 0.75, orbit: 14.8, speed: 0.034, rings: true,
+    info: 'Famous for its ice rings and 82+ moons. Titan, its largest moon, has lakes of liquid methane and is bigger than Mercury!',
+    moons: [ ['Titan', 0.065, 1.85, 40, 'ice'], ['Rhea', 0.035, 1.55, 55, 'ice'], ['Enceladus', 0.028, 1.3, 70, 'ice'] ] },
+  { id: 'uranus', name: 'Uranus', tex: 'uranus', radius: 0.42, orbit: 17.6, speed: 0.012,
+    info: 'The sideways planet - tilted 98 degrees! It has 27 moons named after Shakespeare characters, like Titania and Oberon.',
+    moons: [ ['Titania', 0.04, 0.85, 50, 'ice'], ['Oberon', 0.038, 1.05, 40, 'ice'] ] },
+  { id: 'neptune', name: 'Neptune', tex: 'neptune', radius: 0.4, orbit: 20, speed: 0.006,
+    info: 'The windiest planet (2,100 km/h winds!) with 14 moons. Its biggest moon Triton orbits BACKWARDS and is slowly spiraling inward!',
+    moons: [ ['Triton', 0.05, 0.85, -45, 'ice'] ] }
+];
+
+const SUN_INFO = 'The Sun is a giant ball of burning gas holding 99.8% of all mass in the solar system. 1.3 million Earths could fit inside! Core temperature: 15 million degrees C.';
+
+// =====================================================================
+// BUILD THE SOLAR SYSTEM
+// =====================================================================
+(function buildSystem() {
+  const root = document.querySelector('#solarsystem');
+
+  // --- SUN (biggest body, emissive so it glows; doesn't need external light) ---
+  const sun = document.createElement('a-sphere');
+  sun.setAttribute('id', 'sun');
+  sun.setAttribute('class', 'celestial');
+  sun.setAttribute('radius', '2.6');
+  sun.setAttribute('segments-height', '48');
+  sun.setAttribute('segments-width', '48');
+  sun.setAttribute('material', `src: ${makeTexture('sun')}; emissive: #FF8800; emissiveIntensity: 0.85; shader: standard`);
+  sun.setAttribute('data-name', 'The Sun');
+  sun.setAttribute('data-info', SUN_INFO);
+  root.appendChild(sun);
+
+  const halo = document.createElement('a-sphere');
+  halo.setAttribute('radius', '2.95');
+  halo.setAttribute('material', 'color: #FF9900; transparent: true; opacity: 0.14; shader: flat; side: back');
+  root.appendChild(halo);
+
+  // --- PLANETS ---
+  PLANETS.forEach(p => {
+    const orbit = document.createElement('a-entity');
+    orbit.setAttribute('id', p.id + '-orbit');
+    orbit.setAttribute('class', 'orbit-pivot');
+    orbit.setAttribute('data-speed', p.speed);
+    // random start angle so planets are spread out
+    orbit.setAttribute('data-angle', Math.random() * 360);
+
+    const holder = document.createElement('a-entity');
+    holder.setAttribute('position', `${p.orbit} 0 0`);
+    holder.setAttribute('id', p.id + '-holder');
+
+    const body = document.createElement('a-sphere');
+    body.setAttribute('id', p.id);
+    body.setAttribute('class', 'celestial planet-spin');
+    body.setAttribute('radius', p.radius);
+    body.setAttribute('segments-height', '36');
+    body.setAttribute('segments-width', '36');
+    body.setAttribute('material', `src: ${makeTexture(p.tex)}; roughness: 0.9; metalness: 0`);
+    body.setAttribute('shadow', 'cast: true; receive: true');
+    body.setAttribute('data-name', p.name);
+    body.setAttribute('data-info', p.info);
+    holder.appendChild(body);
+
+    // rings for saturn
+    if (p.rings) {
+      const ring = document.createElement('a-torus');
+      ring.setAttribute('radius', p.radius * 1.8);
+      ring.setAttribute('radius-tubular', p.radius * 0.17);
+      ring.setAttribute('rotation', '75 0 0');
+      ring.setAttribute('material', 'color: #F4E4A8; opacity: 0.8; transparent: true; side: double; shader: flat');
+      holder.appendChild(ring);
+    }
+
+    // moons
+    p.moons.forEach((m, mi) => {
+      const [mName, mRad, mOrbit, mSpeed, mTex] = m;
+      const mPivot = document.createElement('a-entity');
+      mPivot.setAttribute('class', 'moon-pivot');
+      mPivot.setAttribute('data-speed', mSpeed);
+      mPivot.setAttribute('data-angle', Math.random() * 360);
+
+      const mBody = document.createElement('a-sphere');
+      mBody.setAttribute('class', 'celestial');
+      mBody.setAttribute('radius', mRad);
+      mBody.setAttribute('segments-height', '18');
+      mBody.setAttribute('segments-width', '18');
+      mBody.setAttribute('position', `${mOrbit} 0 0`);
+      mBody.setAttribute('material', `src: ${makeTexture(mTex)}; roughness: 0.95; metalness: 0`);
+      mBody.setAttribute('shadow', 'cast: true; receive: true');
+      mBody.setAttribute('data-name', mName + ' (moon of ' + p.name + ')');
+      mBody.setAttribute('data-info', mName + ' is one of ' + p.name + "'s moons. " + (mi === 0 ? 'Point at the planet itself to learn more about the whole system!' : ''));
+      mPivot.appendChild(mBody);
+      holder.appendChild(mPivot);
+
+      // small moon orbit ring
+      const mRing = document.createElement('a-torus');
+      mRing.setAttribute('radius', mOrbit);
+      mRing.setAttribute('radius-tubular', '0.006');
+      mRing.setAttribute('rotation', '90 0 0');
+      mRing.setAttribute('material', 'color: #7fd4f7; opacity: 0.18; transparent: true; shader: flat');
+      holder.appendChild(mRing);
+    });
+
+    orbit.appendChild(holder);
+    root.appendChild(orbit);
+
+    // planet orbit ring
+    const ring = document.createElement('a-torus');
+    ring.setAttribute('radius', p.orbit);
+    ring.setAttribute('radius-tubular', '0.015');
+    ring.setAttribute('rotation', '90 0 0');
+    ring.setAttribute('material', 'color: #4fc3f7; opacity: 0.2; transparent: true; shader: flat');
+    root.appendChild(ring);
+  });
+})();
+
+// =====================================================================
+// STARFIELD
+// =====================================================================
+(function generateStars() {
+  const starfield = document.querySelector('#starfield');
+  let html = '';
+  for (let i = 0; i < 350; i++) {
+    const x = (Math.random() - 0.5) * 180;
+    const y = (Math.random() - 0.5) * 180;
+    const z = (Math.random() - 0.5) * 180;
+    const size = (Math.random() * 0.14 + 0.03).toFixed(2);
+    html += `<a-sphere position="${x.toFixed(1)} ${y.toFixed(1)} ${z.toFixed(1)}" radius="${size}" color="#ffffff" material="shader: flat"></a-sphere>`;
+  }
+  starfield.innerHTML = html;
+})();
+
+// =====================================================================
+// STATE + LESSONS
+// =====================================================================
+let currentLesson = 0;
+let speed = 1;
+
+const lessons = [
+  { title: "THE SOLAR SYSTEM", short: "Solar System",
+    desc: "8 planets and their moons orbit the Sun. Point at anything to see its name; click / trigger for facts. Left stick = fly!" },
+  { title: "LESSON 1: ORBITS", short: "1. Orbits",
+    desc: "Planets closer to the Sun orbit faster: Mercury takes 88 days, Neptune 165 years! Watch the moons orbiting their planets too." },
+  { title: "LESSON 2: DAY AND NIGHT", short: "2. Day & Night",
+    desc: "Look at any planet: the side facing the Sun is bright (day) and the far side is dark (night). Earth spins once every 24 hours." },
+  { title: "LESSON 3: SEASONS", short: "3. Seasons",
+    desc: "Earth's axis is tilted 23.5 degrees. Each hemisphere leans toward or away from the Sun through the year - that's what makes summer and winter!" },
+  { title: "LESSON 4: MOON PHASES", short: "4. Moon Phases",
+    desc: "Fly close to Earth and watch its Moon: the sunlit half changes as it orbits. From Earth we see new moon, crescent, half, gibbous, full - a 29.5-day cycle." },
+  { title: "LESSON 5: TIDES", short: "5. Tides",
+    desc: "The Moon's gravity pulls Earth's oceans, creating water bulges on both sides of the planet - these are the high tides, happening twice a day." },
+  { title: "LESSON 6: ECLIPSES", short: "6. Eclipses",
+    desc: "Solar eclipse: the Moon passes between the Sun and Earth, casting its shadow on Earth. Lunar eclipse: Earth's shadow falls on the Moon. Watch the shadows in this simulation!" }
+];
+
+// build VR menu buttons
+(function buildVRMenu() {
+  const container = document.querySelector('#vrMenuButtons');
+  lessons.forEach((lesson, i) => {
+    const y = 2.4 - i * 0.78;
+    const btn = document.createElement('a-plane');
+    btn.setAttribute('class', 'vrbtn');
+    btn.setAttribute('data-action', 'lesson');
+    btn.setAttribute('data-lesson', i);
+    btn.setAttribute('width', '4.6');
+    btn.setAttribute('height', '0.62');
+    btn.setAttribute('position', `0 ${y} 0`);
+    btn.setAttribute('color', i === 0 ? '#ffca28' : '#1c3a5e');
+    btn.setAttribute('material', 'shader: flat');
+    const label = document.createElement('a-text');
+    label.setAttribute('value', lesson.short);
+    label.setAttribute('color', i === 0 ? '#001a33' : '#e0e0e0');
+    label.setAttribute('align', 'center');
+    label.setAttribute('width', '5.5');
+    label.setAttribute('position', '0 0 0.01');
+    btn.appendChild(label);
+    container.appendChild(btn);
+  });
+})();
+
+function highlightVRMenu(n) {
+  document.querySelectorAll('#vrMenuButtons .vrbtn').forEach((b) => {
+    const idx = parseInt(b.getAttribute('data-lesson'));
+    b.setAttribute('color', idx === n ? '#ffca28' : '#1c3a5e');
+    const t = b.querySelector('a-text');
+    if (t) t.setAttribute('color', idx === n ? '#001a33' : '#e0e0e0');
+  });
+}
+
+function setLesson(n) {
+  currentLesson = n;
+  const lesson = lessons[n];
+  document.querySelector('#title').innerHTML = lesson.title;
+  document.querySelector('#description').innerHTML = lesson.desc;
+  document.querySelectorAll('.nav-btn').forEach((b, i) => b.classList.toggle('active', i === n));
+  document.querySelector('#vrInfoTitle').setAttribute('value', lesson.title);
+  document.querySelector('#vrInfoBody').setAttribute('value', lesson.desc);
+  highlightVRMenu(n);
+}
+
+function showPlanetInfo(name, info) {
+  document.querySelector('#title').innerHTML = name;
+  document.querySelector('#description').innerHTML = info;
+  document.querySelector('#vrInfoTitle').setAttribute('value', name.toUpperCase());
+  document.querySelector('#vrInfoBody').setAttribute('value', info);
+}
+
+function changeSpeed(delta) {
+  speed = Math.max(0.1, Math.min(4, +(speed + delta).toFixed(1)));
+  document.querySelector('#speedNum').textContent = speed.toFixed(1) + 'x';
+  document.querySelector('#vrSpeedLabel').setAttribute('value', 'Orbit Speed: ' + speed.toFixed(1) + 'x');
+}
+
+// =====================================================================
+// THUMBSTICK LOCOMOTION
+// =====================================================================
+AFRAME.registerComponent('thumbstick-locomotion', {
+  init: function () {
+    this.moveX = 0; this.moveY = 0; this.snapReady = true;
+    const rig = this.el;
+    const bind = () => {
+      ['#leftHand', '#rightHand'].forEach((sel) => {
+        const hand = document.querySelector(sel);
+        if (!hand || hand.dataset.stickBound) return;
+        hand.dataset.stickBound = '1';
+        const isLeft = sel === '#leftHand';
         hand.addEventListener('thumbstickmoved', (evt) => {
-          if (isLeft) {
-            this.moveX = evt.detail.x;
-            this.moveY = evt.detail.y;
-          } else {
-            // Right stick: snap turn
+          if (isLeft) { this.moveX = evt.detail.x; this.moveY = evt.detail.y; }
+          else {
             const x = evt.detail.x;
-            if (Math.abs(x) < 0.3) { this.snapReady = true; }
+            if (Math.abs(x) < 0.3) this.snapReady = true;
             else if (this.snapReady && Math.abs(x) > 0.7) {
               this.snapReady = false;
               const rot = rig.getAttribute('rotation');
@@ -317,189 +504,105 @@
             }
           }
         });
-      };
-      // Controllers may connect late — bind on connect events too
-      const tryBind = () => {
-        bindStick('#leftHand', true);
-        bindStick('#rightHand', false);
-      };
-      tryBind();
-      this.el.sceneEl.addEventListener('controllerconnected', tryBind);
-    },
-    tick: function (time, delta) {
-      if (Math.abs(this.moveX) < 0.1 && Math.abs(this.moveY) < 0.1) return;
-      const rig = this.el;
-      const head = document.querySelector('#head');
-      const speed = 8 * (delta / 1000); // units per second
+      });
+    };
+    bind();
+    this.el.sceneEl.addEventListener('controllerconnected', bind);
+  },
+  tick: function (time, delta) {
+    if (Math.abs(this.moveX) < 0.1 && Math.abs(this.moveY) < 0.1) return;
+    const head = document.querySelector('#head');
+    const spd = 8 * (delta / 1000);
+    const q = head.object3D.getWorldQuaternion(new THREE.Quaternion());
+    const dir = new THREE.Vector3(this.moveX, 0, this.moveY);
+    dir.applyQuaternion(q); dir.y = 0;
+    dir.normalize().multiplyScalar(spd * Math.hypot(this.moveX, this.moveY));
+    this.el.object3D.position.x += dir.x;
+    this.el.object3D.position.z += dir.z;
+  }
+});
 
-      // Move relative to where the user is looking (yaw only)
-      const headRot = head.object3D.getWorldQuaternion(new THREE.Quaternion());
-      const dir = new THREE.Vector3(this.moveX, 0, this.moveY);
-      dir.applyQuaternion(headRot);
-      dir.y = 0; // stay level
-      dir.normalize().multiplyScalar(speed * Math.hypot(this.moveX, this.moveY));
+// =====================================================================
+// SOLAR ANIMATOR — runs in A-Frame's tick, so it WORKS IN VR
+// (requestAnimationFrame stops in VR; component tick does not)
+// =====================================================================
+AFRAME.registerComponent('solar-animator', {
+  tick: function (time, delta) {
+    const dt = (delta / 1000) * speed; // seconds * multiplier
 
-      const pos = rig.object3D.position;
-      pos.x += dir.x;
-      pos.z += dir.z;
-    }
-  });
-
-  // ===================================================================
-  // STARFIELD
-  // ===================================================================
-  (function generateStars() {
-    const starfield = document.querySelector('#starfield');
-    let html = '';
-    for (let i = 0; i < 400; i++) {
-      const x = (Math.random() - 0.5) * 180;
-      const y = (Math.random() - 0.5) * 180;
-      const z = (Math.random() - 0.5) * 180;
-      const size = (Math.random() * 0.14 + 0.03).toFixed(2);
-      html += `<a-sphere position="${x.toFixed(1)} ${y.toFixed(1)} ${z.toFixed(1)}" radius="${size}" color="#ffffff" material="shader: flat"></a-sphere>`;
-    }
-    starfield.innerHTML = html;
-  })();
-
-  // ===================================================================
-  // STATE
-  // ===================================================================
-  let currentLesson = 0;
-  let speed = 1;
-  const angles = { mercury: 0, venus: 0, earth: 0, mars: 0, jupiter: 0, saturn: 0, uranus: 0, neptune: 0, moon: 0 };
-  const orbitSpeeds = { mercury: 4.1, venus: 1.6, earth: 1, mars: 0.53, jupiter: 0.084, saturn: 0.034, uranus: 0.012, neptune: 0.006, moon: 13 };
-
-  const lessons = [
-    { title: "THE SOLAR SYSTEM", short: "🌌 Solar System",
-      desc: "All 8 planets orbit the Sun. Point your laser at any planet and pull the trigger to learn about it. Left joystick to fly!" },
-    { title: "LESSON 1: ORBITS", short: "1. Orbits",
-      desc: "All planets orbit the Sun in near-circular paths. Planets closer to the Sun orbit faster: Mercury takes 88 days, Neptune takes 165 years!" },
-    { title: "LESSON 2: DAY AND NIGHT", short: "2. Day & Night",
-      desc: "As Earth spins on its axis, one side faces the Sun (day) while the other is dark (night). One full spin takes 24 hours. Fly close to Earth and watch it rotate!" },
-    { title: "LESSON 3: SEASONS", short: "3. Seasons",
-      desc: "Earth's axis is tilted 23.5 degrees. As Earth orbits the Sun, each hemisphere leans toward or away from the Sun at different times of year — that's what makes summer and winter!" },
-    { title: "LESSON 4: MOON PHASES", short: "4. Moon Phases",
-      desc: "As the Moon orbits Earth every 29.5 days, we see different amounts of its sunlit half: new moon, crescent, half, gibbous, then full moon. Watch the Moon circle Earth!" },
-    { title: "LESSON 5: TIDES", short: "5. Tides",
-      desc: "The Moon's gravity pulls on Earth's oceans, making the water bulge on the side facing the Moon AND the opposite side. These bulges are the high tides, happening twice a day." },
-    { title: "LESSON 6: ECLIPSES", short: "6. Eclipses",
-      desc: "A solar eclipse: the Moon passes exactly between the Sun and Earth, blocking the sunlight. A lunar eclipse: Earth passes between the Sun and Moon, casting its shadow on the Moon." }
-  ];
-
-  // ===================================================================
-  // IN-VR MENU: build lesson buttons as 3D planes
-  // ===================================================================
-  (function buildVRMenu() {
-    const container = document.querySelector('#vrMenuButtons');
-    lessons.forEach((lesson, i) => {
-      const y = 2.4 - i * 0.78;
-      const btn = document.createElement('a-plane');
-      btn.setAttribute('class', 'vrbtn');
-      btn.setAttribute('data-action', 'lesson');
-      btn.setAttribute('data-lesson', i);
-      btn.setAttribute('width', '4.6');
-      btn.setAttribute('height', '0.62');
-      btn.setAttribute('position', `0 ${y} 0`);
-      btn.setAttribute('color', i === 0 ? '#ffca28' : '#1c3a5e');
-      btn.setAttribute('material', 'shader: flat');
-
-      const label = document.createElement('a-text');
-      label.setAttribute('value', lesson.short);
-      label.setAttribute('color', i === 0 ? '#001a33' : '#e0e0e0');
-      label.setAttribute('align', 'center');
-      label.setAttribute('width', '5.5');
-      label.setAttribute('position', '0 0 0.01');
-      btn.appendChild(label);
-      container.appendChild(btn);
+    // planet orbits
+    document.querySelectorAll('.orbit-pivot').forEach(el => {
+      let a = parseFloat(el.dataset.angle || 0);
+      a += parseFloat(el.dataset.speed) * 6 * dt; // deg per second scaled
+      el.dataset.angle = a;
+      el.object3D.rotation.y = THREE.MathUtils.degToRad(a);
     });
-  })();
 
-  function highlightVRMenu(n) {
-    document.querySelectorAll('#vrMenuButtons .vrbtn').forEach((b) => {
-      const idx = parseInt(b.getAttribute('data-lesson'));
-      b.setAttribute('color', idx === n ? '#ffca28' : '#1c3a5e');
-      const t = b.querySelector('a-text');
-      if (t) t.setAttribute('color', idx === n ? '#001a33' : '#e0e0e0');
+    // moon orbits
+    document.querySelectorAll('.moon-pivot').forEach(el => {
+      let a = parseFloat(el.dataset.angle || 0);
+      a += parseFloat(el.dataset.speed) * dt;
+      el.dataset.angle = a;
+      el.object3D.rotation.y = THREE.MathUtils.degToRad(a);
+    });
+
+    // planet self-spin
+    document.querySelectorAll('.planet-spin').forEach(el => {
+      el.object3D.rotation.y += 0.4 * dt;
     });
   }
+});
+document.querySelector('a-scene').setAttribute('solar-animator', '');
 
-  // ===================================================================
-  // LESSON / INFO LOGIC — updates BOTH the HTML panel and the VR board
-  // ===================================================================
-  function setLesson(n) {
-    currentLesson = n;
-    const lesson = lessons[n];
-    // HTML (desktop)
-    document.querySelector('#title').innerHTML = lesson.title;
-    document.querySelector('#description').innerHTML = lesson.desc;
-    document.querySelectorAll('.nav-btn').forEach((b, i) => b.classList.toggle('active', i === n));
-    // VR board
-    document.querySelector('#vrInfoTitle').setAttribute('value', lesson.title);
-    document.querySelector('#vrInfoBody').setAttribute('value', lesson.desc);
-    highlightVRMenu(n);
-  }
+// =====================================================================
+// HOVER LABELS — name appears when laser/cursor points at a body
+// =====================================================================
+(function setupHover() {
+  const label = document.querySelector('#hoverLabel');
+  const labelText = document.querySelector('#hoverLabelText');
+  const scene = document.querySelector('a-scene');
 
-  function showPlanetInfo(name, info) {
-    document.querySelector('#title').innerHTML = '🪐 ' + name;
-    document.querySelector('#description').innerHTML = info;
-    document.querySelector('#vrInfoTitle').setAttribute('value', name.toUpperCase());
-    document.querySelector('#vrInfoBody').setAttribute('value', info);
-  }
-
-  function changeSpeed(delta) {
-    speed = Math.max(0.1, Math.min(3, +(speed + delta).toFixed(1)));
-    document.querySelector('#speedNum').textContent = speed.toFixed(1) + 'x';
-    document.querySelector('#vrSpeedLabel').setAttribute('value', 'Orbit Speed: ' + speed.toFixed(1) + 'x');
-  }
-
-  // ===================================================================
-  // CLICK HANDLING — works for mouse cursor AND VR laser triggers
-  // ===================================================================
-  document.querySelectorAll('.celestial').forEach(el => {
-    el.addEventListener('click', () => {
-      showPlanetInfo(el.getAttribute('data-name'), el.getAttribute('data-info'));
-    });
-  });
-
-  // VR menu button clicks (event delegation on scene since buttons are dynamic)
-  document.querySelector('a-scene').addEventListener('click', (evt) => {
+  scene.addEventListener('mouseenter', (evt) => {
     const el = evt.target;
-    if (!el.classList || !el.classList.contains('vrbtn')) return;
+    if (!el.classList || !el.classList.contains('celestial')) return;
+    labelText.setAttribute('value', el.getAttribute('data-name'));
+    label.setAttribute('visible', true);
+    // place label above the body in world coords
+    const p = new THREE.Vector3();
+    el.object3D.getWorldPosition(p);
+    const r = parseFloat(el.getAttribute('radius')) || 0.3;
+    label.setAttribute('position', `${p.x} ${p.y + r + 0.5} ${p.z}`);
+    // face the user
+    const head = document.querySelector('#head');
+    const hp = new THREE.Vector3();
+    head.object3D.getWorldPosition(hp);
+    label.object3D.lookAt(hp);
+  }, true);
+
+  scene.addEventListener('mouseleave', (evt) => {
+    const el = evt.target;
+    if (!el.classList || !el.classList.contains('celestial')) return;
+    label.setAttribute('visible', false);
+  }, true);
+})();
+
+// =====================================================================
+// CLICKS — planets & VR menu (works for mouse and VR trigger)
+// =====================================================================
+document.querySelector('a-scene').addEventListener('click', (evt) => {
+  const el = evt.target;
+  if (!el.classList) return;
+  if (el.classList.contains('celestial')) {
+    showPlanetInfo(el.getAttribute('data-name'), el.getAttribute('data-info'));
+  } else if (el.classList.contains('vrbtn')) {
     const action = el.getAttribute('data-action');
     if (action === 'lesson') setLesson(parseInt(el.getAttribute('data-lesson')));
     if (action === 'speed-up') changeSpeed(0.3);
     if (action === 'speed-down') changeSpeed(-0.3);
-  });
-
-  // ===================================================================
-  // ANIMATION LOOP
-  // ===================================================================
-  function animate() {
-    requestAnimationFrame(animate);
-
-    Object.keys(angles).forEach(key => {
-      if (key === 'moon') return;
-      const el = document.querySelector(`#${key}-orbit`);
-      if (el) {
-        angles[key] += orbitSpeeds[key] * 0.02 * speed;
-        el.setAttribute('rotation', `0 ${angles[key]} 0`);
-      }
-    });
-
-    const moonOrbit = document.querySelector('#moon-orbit');
-    if (moonOrbit) {
-      angles.moon += orbitSpeeds.moon * 0.02 * speed;
-      moonOrbit.setAttribute('rotation', `0 ${angles.moon} 0`);
-    }
-
-    document.querySelectorAll('.celestial').forEach(el => {
-      const spin = (parseFloat(el.getAttribute('data-spin')) || 0) + 0.4 * speed;
-      el.setAttribute('data-spin', spin);
-      el.setAttribute('rotation', `0 ${spin} 0`);
-    });
   }
-  animate();
-  setLesson(0);
+});
+
+setLesson(0);
 </script>
 
 </body>
