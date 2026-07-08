@@ -1,514 +1,309 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Space Explorer VR | Interactive Solar System</title>
+  <title>Space Explorer VR | Solar System</title>
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Roboto', sans-serif; background: #000; }
+    body { font-family: Arial, sans-serif; }
     #header {
-      position: fixed; top: 0; left: 0; right: 0; height: 56px;
-      background: linear-gradient(135deg, rgba(15,32,64,0.98), rgba(25,45,80,0.98));
-      border-bottom: 2px solid rgba(79,195,247,0.5);
+      position: fixed; top: 0; left: 0; right: 0;
+      background: rgba(10,20,40,0.95); border-bottom: 2px solid #4fc3f7;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 20px; z-index: 1000;
+      padding: 10px 16px; z-index: 1000; flex-wrap: wrap; gap: 8px;
     }
-    .logo { display: flex; align-items: center; gap: 10px; font-family: 'Orbitron', sans-serif;
-      color: #4fc3f7; font-size: 16px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
-    .logo span { font-size: 22px; }
-    .nav-buttons { display: flex; gap: 5px; flex-wrap: wrap; max-width: 72%; justify-content: flex-end; }
-    .nav-btn {
-      background: linear-gradient(135deg, rgba(79,195,247,0.15), rgba(63,81,181,0.15));
-      color: #e0e0e0; border: 1.5px solid rgba(79,195,247,0.4); border-radius: 8px;
-      padding: 6px 11px; font-size: 11px; font-weight: 500; cursor: pointer; transition: all 0.25s ease; white-space: nowrap;
+    #header .logo { color: #4fc3f7; font-weight: bold; font-size: 15px; letter-spacing: 1px; }
+    #header .btns { display: flex; gap: 5px; flex-wrap: wrap; }
+    #header button {
+      background: #1c3a5e; color: #fff; border: 1px solid #4fc3f7;
+      border-radius: 6px; padding: 6px 10px; font-size: 11px; cursor: pointer;
     }
-    .nav-btn:hover { background: linear-gradient(135deg, rgba(79,195,247,0.35), rgba(63,81,181,0.35)); }
-    .nav-btn.active { background: linear-gradient(135deg, #4fc3f7, #29b6f6); border-color: #4fc3f7; color: #001a33; font-weight: 600; }
-    #speedControl {
-      position: fixed; top: 68px; right: 18px;
-      background: linear-gradient(135deg, rgba(15,32,64,0.95), rgba(25,45,80,0.95));
-      border: 1.5px solid rgba(79,195,247,0.4); border-radius: 12px;
-      padding: 10px 14px; font-size: 12px; color: #e0e0e0; z-index: 999; font-weight: 500;
+    #header button.active { background: #ffca28; color: #001a33; font-weight: bold; }
+    #speed {
+      position: fixed; top: 58px; right: 14px; z-index: 1000;
+      background: rgba(10,20,40,0.9); border: 1px solid #4fc3f7; border-radius: 8px;
+      padding: 8px 12px; color: #fff; font-size: 12px;
     }
-    #speedControl button {
-      background: rgba(79,195,247,0.2); color: #4fc3f7; border: 1px solid rgba(79,195,247,0.5);
-      border-radius: 6px; padding: 4px 9px; margin: 0 4px; font-weight: 600; cursor: pointer;
+    #speed button {
+      background: #1c3a5e; color: #4fc3f7; border: 1px solid #4fc3f7;
+      border-radius: 5px; padding: 3px 8px; margin: 0 3px; cursor: pointer; font-weight: bold;
     }
-    #speedNum { color: #4fc3f7; font-weight: 600; font-family: 'Orbitron', sans-serif; min-width: 34px; text-align: center; display: inline-block; }
     #info {
-      position: fixed; bottom: 18px; left: 18px; width: 360px;
-      background: linear-gradient(135deg, rgba(15,32,64,0.97), rgba(25,45,80,0.97));
-      border: 1.5px solid rgba(79,195,247,0.5); border-radius: 12px;
-      padding: 18px; color: #e0e0e0; z-index: 999; max-height: 32vh; overflow-y: auto;
+      position: fixed; bottom: 14px; left: 14px; z-index: 1000; max-width: 340px;
+      background: rgba(10,20,40,0.92); border: 1px solid #4fc3f7; border-radius: 10px;
+      padding: 14px; color: #cfd8dc;
     }
-    #info h3 { color: #4fc3f7; margin-bottom: 8px; font-size: 17px; font-weight: 600; text-transform: uppercase; font-family: 'Orbitron', sans-serif; }
-    #info p { line-height: 1.55; font-size: 13px; color: #b0bec5; }
-    #sidebar {
-      position: fixed; right: 18px; bottom: 18px; width: 250px;
-      background: linear-gradient(135deg, rgba(15,32,64,0.97), rgba(25,45,80,0.97));
-      border: 1.5px solid rgba(79,195,247,0.5); border-radius: 12px;
-      padding: 14px; color: #e0e0e0; z-index: 999; font-size: 11px; max-height: 32vh; overflow-y: auto;
-    }
-    #sidebar h4 { color: #4fc3f7; font-size: 12px; margin-bottom: 7px; text-transform: uppercase; font-family: 'Orbitron', sans-serif; }
-    #sidebar p { line-height: 1.5; color: #b0bec5; margin: 5px 0; }
-    /* On-screen error banner so we never get a silent blue screen again */
-    #errbar {
-      position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
-      background: #b71c1c; color: #fff; padding: 8px 16px; border-radius: 8px;
-      font-size: 12px; z-index: 3000; display: none; max-width: 90%; text-align: center;
-    }
-    @media (max-width: 768px) {
-      #header { height: auto; flex-direction: column; gap: 5px; padding: 6px; }
-      .nav-buttons { max-width: 100%; justify-content: center; }
-      #info, #sidebar { width: calc(50% - 22px); font-size: 10px; padding: 9px; }
-      #speedControl { top: auto; bottom: 34vh; right: 8px; }
-    }
+    #info h3 { color: #4fc3f7; font-size: 15px; margin-bottom: 6px; }
+    #info p { font-size: 12px; line-height: 1.5; }
   </style>
 </head>
 <body>
 
-<div id="errbar"></div>
-
 <div id="header">
-  <div class="logo"><span>🚀</span><span>Space Explorer VR</span></div>
-  <div class="nav-buttons">
-    <button class="nav-btn active" onclick="setLesson(0)">🌌 Solar System</button>
-    <button class="nav-btn" onclick="setLesson(1)">① Orbits</button>
-    <button class="nav-btn" onclick="setLesson(2)">② Day & Night</button>
-    <button class="nav-btn" onclick="setLesson(3)">③ Seasons</button>
-    <button class="nav-btn" onclick="setLesson(4)">④ Phases</button>
-    <button class="nav-btn" onclick="setLesson(5)">⑤ Tides</button>
-    <button class="nav-btn" onclick="setLesson(6)">⑥ Eclipses</button>
+  <div class="logo">🚀 SPACE EXPLORER VR</div>
+  <div class="btns">
+    <button class="active" onclick="setLesson(0)">Solar System</button>
+    <button onclick="setLesson(1)">1. Orbits</button>
+    <button onclick="setLesson(2)">2. Day &amp; Night</button>
+    <button onclick="setLesson(3)">3. Seasons</button>
+    <button onclick="setLesson(4)">4. Phases</button>
+    <button onclick="setLesson(5)">5. Tides</button>
+    <button onclick="setLesson(6)">6. Eclipses</button>
   </div>
 </div>
 
-<div id="speedControl">
-  <strong>Orbit Speed:</strong>
-  <button onclick="changeSpeed(-0.3)">−</button><span id="speedNum">1.0x</span><button onclick="changeSpeed(0.3)">+</button>
+<div id="speed">
+  Speed: <button onclick="changeSpeed(-0.3)">−</button><span id="speedNum">1.0x</span><button onclick="changeSpeed(0.3)">+</button>
 </div>
 
 <div id="info">
-  <h3 id="title">🌌 The Solar System</h3>
-  <p id="description">8 planets and their moons orbit the Sun. Point at anything to see its name; click or trigger for facts. Left stick = fly!</p>
+  <h3 id="title">The Solar System</h3>
+  <p id="desc">8 planets and their moons orbit the Sun. Point at a planet and click (or pull the trigger in VR) to learn about it. Left stick to fly.</p>
 </div>
 
-<div id="sidebar">
-  <h4>📚 How to Use</h4>
-  <p><strong>Desktop:</strong> WASD fly, drag to look, click planets</p>
-  <p><strong>Quest 3S:</strong> Left stick move, right stick turn, laser + trigger to click</p>
-  <p style="color:#4fc3f7;"><strong>Tip:</strong> planets have moons now. Point the laser at any body to see its name!</p>
-</div>
+<a-scene background="color: #000010">
 
-<a-scene background="color: #000006" vr-mode-ui="enterVRButton: #vrbtn" loading-screen="dotsColor: #4fc3f7; backgroundColor: #000006">
-
-  <a-entity id="rig" position="0 2 11">
-    <a-entity id="head" camera position="0 1.6 0" look-controls wasd-controls="acceleration: 45">
-      <a-entity id="cursor" cursor="rayOrigin: mouse; fuse: false" raycaster="objects: .clickable; far: 60"
-                geometry="primitive: ring; radiusInner: 0.008; radiusOuter: 0.012"
-                material="color: #4fc3f7; shader: flat"
-                position="0 0 -0.5"></a-entity>
+  <!-- Camera rig with movement + controllers -->
+  <a-entity id="rig" position="0 2 11" movement-controls="speed: 0.3; fly: true">
+    <a-entity camera position="0 1.6 0" look-controls>
+      <a-cursor color="#4fc3f7" raycaster="objects: .clickable"></a-cursor>
     </a-entity>
-    <a-entity id="leftHand" laser-controls="hand: left" raycaster="objects: .clickable; far: 60" line="color: #4fc3f7; opacity: 0.85"></a-entity>
-    <a-entity id="rightHand" laser-controls="hand: right" raycaster="objects: .clickable; far: 60" line="color: #4fc3f7; opacity: 0.85"></a-entity>
+    <a-entity laser-controls="hand: right" raycaster="objects: .clickable; far: 40"></a-entity>
+    <a-entity laser-controls="hand: left" raycaster="objects: .clickable; far: 40"></a-entity>
 
-    <!-- Boards follow the user (children of rig). Smaller & pushed to sides. -->
-    <a-entity id="vrMenu" position="-2.7 1.2 -3.2" rotation="0 32 0" scale="0.34 0.34 0.34">
-      <a-plane width="5.4" height="7.6" color="#0f2040" opacity="0.9" material="shader: flat; transparent: true" position="0 0 -0.02"></a-plane>
-      <a-text value="LESSON MENU" color="#4fc3f7" align="center" width="7" position="0 3.4 0"></a-text>
-      <a-entity id="vrMenuButtons"></a-entity>
-      <a-text id="vrSpeedLabel" value="Orbit Speed: 1.0x" color="#ffca28" align="center" width="5" position="0 -2.7 0"></a-text>
-      <a-text id="vrDebug" value="frames: 0" color="#69f0ae" align="center" width="4.5" position="0 -4.1 0"></a-text>
-      <a-plane class="clickable vrbtn" data-action="speed-down" width="1" height="0.55" color="#263238" position="-1.3 -3.35 0" material="shader: flat">
-        <a-text value="-" color="#4fc3f7" align="center" width="6" position="0 0 0.01"></a-text>
-      </a-plane>
-      <a-plane class="clickable vrbtn" data-action="speed-up" width="1" height="0.55" color="#263238" position="1.3 -3.35 0" material="shader: flat">
-        <a-text value="+" color="#4fc3f7" align="center" width="6" position="0 0 0.01"></a-text>
-      </a-plane>
+    <!-- VR menu board (follows the user) -->
+    <a-entity position="-2.4 1.2 -3" rotation="0 30 0" scale="0.4 0.4 0.4">
+      <a-plane width="5" height="7" color="#0a1428" opacity="0.9"></a-plane>
+      <a-text value="LESSON MENU" color="#4fc3f7" align="center" position="0 3 0" width="8"></a-text>
+      <a-entity id="vrMenuBtns"></a-entity>
     </a-entity>
 
-    <a-entity id="vrInfoBoard" position="2.7 1.2 -3.2" rotation="0 -32 0" scale="0.34 0.34 0.34">
-      <a-plane width="7" height="5.2" color="#0f2040" opacity="0.9" material="shader: flat; transparent: true" position="0 0 -0.02"></a-plane>
-      <a-text id="vrInfoTitle" value="THE SOLAR SYSTEM" color="#4fc3f7" align="center" width="9" position="0 2 0"></a-text>
-      <a-text id="vrInfoBody" value="Point your laser at any planet to see its name. Pull the trigger for full facts. Use the left stick to fly around!" color="#e0e0e0" align="center" width="6.2" wrap-count="40" position="0 -0.2 0"></a-text>
+    <!-- VR info board (follows the user) -->
+    <a-entity position="2.4 1.2 -3" rotation="0 -30 0" scale="0.4 0.4 0.4">
+      <a-plane width="6.5" height="4.5" color="#0a1428" opacity="0.9"></a-plane>
+      <a-text id="vrTitle" value="THE SOLAR SYSTEM" color="#4fc3f7" align="center" position="0 1.7 0" width="8"></a-text>
+      <a-text id="vrDesc" value="Point at a planet and pull the trigger to learn about it." color="#e0e0e0" align="center" position="0 -0.2 0" width="5.5" wrap-count="34"></a-text>
     </a-entity>
   </a-entity>
 
-  <a-entity light="type: ambient; color: #666; intensity: 0.7"></a-entity>
-  <a-entity light="type: point; color: #fff; intensity: 1.6; distance: 120" position="0 3 0"></a-entity>
+  <!-- Lights -->
+  <a-entity light="type: ambient; intensity: 0.6"></a-entity>
+  <a-entity light="type: point; intensity: 1.5; distance: 100" position="0 3 0"></a-entity>
 
-  <a-entity id="starfield"></a-entity>
+  <!-- Stars -->
+  <a-entity id="stars"></a-entity>
 
-  <a-entity id="hoverLabel" visible="false" position="0 0 0">
-    <a-plane width="2.4" height="0.55" color="#001428" opacity="0.9" material="shader: flat; transparent: true"></a-plane>
-    <a-text id="hoverText" value="" color="#4fc3f7" align="center" width="4.5" position="0 0 0.01"></a-text>
+  <!-- Solar system -->
+  <a-entity id="solar" position="0 3 0">
+
+    <!-- SUN -->
+    <a-sphere class="clickable" data-name="The Sun"
+      data-info="A giant ball of hot gas holding 99.8% of all mass in the solar system. 1.3 million Earths could fit inside!"
+      radius="2.6" color="#FFA500" material="emissive: #FF8800; emissiveIntensity: 0.9"></a-sphere>
+
+    <!-- MERCURY -->
+    <a-entity class="orbit" data-speed="4.1">
+      <a-sphere class="clickable" position="4.2 0 0" radius="0.11" color="#8B7355"
+        data-name="Mercury" data-info="Smallest planet, closest to the Sun. 430C by day, -180C at night."></a-sphere>
+    </a-entity>
+    <a-ring radius-inner="4.19" radius-outer="4.21" rotation="-90 0 0" color="#4fc3f7" material="opacity: 0.25; side: double"></a-ring>
+
+    <!-- VENUS -->
+    <a-entity class="orbit" data-speed="1.6">
+      <a-sphere position="5.6 0 0" radius="0.22" color="#FFC649" class="clickable"
+        data-name="Venus" data-info="Hottest planet at 465C. Wrapped in thick clouds of sulfuric acid."></a-sphere>
+    </a-entity>
+    <a-ring radius-inner="5.59" radius-outer="5.61" rotation="-90 0 0" color="#4fc3f7" material="opacity: 0.25; side: double"></a-ring>
+
+    <!-- EARTH + MOON -->
+    <a-entity class="orbit" data-speed="1">
+      <a-entity position="7.2 0 0">
+        <a-sphere class="clickable" radius="0.24" color="#1E90FF"
+          data-name="Earth" data-info="Our home - the only planet known to have life. 71% is covered in water."></a-sphere>
+        <a-entity class="orbit" data-speed="6">
+          <a-sphere position="0.6 0 0" radius="0.07" color="#C0C0C0" class="clickable"
+            data-name="The Moon" data-info="Earth's only natural satellite. It causes our ocean tides."></a-sphere>
+        </a-entity>
+      </a-entity>
+    </a-entity>
+    <a-ring radius-inner="7.19" radius-outer="7.21" rotation="-90 0 0" color="#4fc3f7" material="opacity: 0.3; side: double"></a-ring>
+
+    <!-- MARS + 2 MOONS -->
+    <a-entity class="orbit" data-speed="0.53">
+      <a-entity position="8.9 0 0">
+        <a-sphere class="clickable" radius="0.16" color="#C1440E"
+          data-name="Mars" data-info="The Red Planet. Rusty iron dust covers it. Home to the tallest volcano in the solar system."></a-sphere>
+        <a-entity class="orbit" data-speed="9"><a-sphere position="0.32 0 0" radius="0.03" color="#9e9e9e" class="clickable" data-name="Phobos" data-info="Phobos is the larger of Mars's two small moons."></a-sphere></a-entity>
+        <a-entity class="orbit" data-speed="6"><a-sphere position="0.45 0 0" radius="0.025" color="#b0b0b0" class="clickable" data-name="Deimos" data-info="Deimos is the smaller, outer moon of Mars."></a-sphere></a-entity>
+      </a-entity>
+    </a-entity>
+    <a-ring radius-inner="8.89" radius-outer="8.91" rotation="-90 0 0" color="#4fc3f7" material="opacity: 0.25; side: double"></a-ring>
+
+    <!-- JUPITER + 4 MOONS -->
+    <a-entity class="orbit" data-speed="0.084">
+      <a-entity position="11.5 0 0">
+        <a-sphere class="clickable" radius="0.9" color="#D9A066"
+          data-name="Jupiter" data-info="The largest planet - 1,300 Earths could fit inside! Its Great Red Spot is a storm bigger than Earth."></a-sphere>
+        <a-entity class="orbit" data-speed="7"><a-sphere position="1.2 0 0" radius="0.06" color="#e8d16a" class="clickable" data-name="Io" data-info="Io is the most volcanically active body in the solar system."></a-sphere></a-entity>
+        <a-entity class="orbit" data-speed="5"><a-sphere position="1.45 0 0" radius="0.055" color="#cfc0a8" class="clickable" data-name="Europa" data-info="Europa may have a liquid water ocean under its icy crust."></a-sphere></a-entity>
+        <a-entity class="orbit" data-speed="3.5"><a-sphere position="1.75 0 0" radius="0.08" color="#9a8b78" class="clickable" data-name="Ganymede" data-info="Ganymede is the largest moon in the solar system - bigger than Mercury!"></a-sphere></a-entity>
+        <a-entity class="orbit" data-speed="2.5"><a-sphere position="2.05 0 0" radius="0.07" color="#7a6f60" class="clickable" data-name="Callisto" data-info="Callisto is one of the most heavily cratered objects in the solar system."></a-sphere></a-entity>
+      </a-entity>
+    </a-entity>
+    <a-ring radius-inner="11.49" radius-outer="11.51" rotation="-90 0 0" color="#4fc3f7" material="opacity: 0.25; side: double"></a-ring>
+
+    <!-- SATURN + RINGS + 2 MOONS -->
+    <a-entity class="orbit" data-speed="0.034">
+      <a-entity position="14.5 0 0">
+        <a-sphere class="clickable" radius="0.75" color="#E3C16F"
+          data-name="Saturn" data-info="Famous for its stunning rings of ice and rock. It has 80+ moons!"></a-sphere>
+        <a-ring radius-inner="0.95" radius-outer="1.5" rotation="75 0 0" color="#F4E4A8" material="opacity: 0.7; side: double"></a-ring>
+        <a-entity class="orbit" data-speed="4"><a-sphere position="1.6 0 0" radius="0.075" color="#c9a15a" class="clickable" data-name="Titan" data-info="Titan has a thick atmosphere and rivers of liquid methane."></a-sphere></a-entity>
+        <a-entity class="orbit" data-speed="2.8"><a-sphere position="1.95 0 0" radius="0.045" color="#b8b8b8" class="clickable" data-name="Rhea" data-info="Rhea is Saturn's second-largest moon, made mostly of ice."></a-sphere></a-entity>
+      </a-entity>
+    </a-entity>
+    <a-ring radius-inner="14.49" radius-outer="14.51" rotation="-90 0 0" color="#4fc3f7" material="opacity: 0.25; side: double"></a-ring>
+
+    <!-- URANUS + 2 MOONS -->
+    <a-entity class="orbit" data-speed="0.012">
+      <a-entity position="17.2 0 0">
+        <a-sphere class="clickable" radius="0.42" color="#7DE3E1"
+          data-name="Uranus" data-info="An ice giant that spins on its side - tilted 98 degrees!"></a-sphere>
+        <a-entity class="orbit" data-speed="4"><a-sphere position="0.8 0 0" radius="0.04" color="#a8c4c3" class="clickable" data-name="Titania" data-info="Titania is the largest moon of Uranus."></a-sphere></a-entity>
+        <a-entity class="orbit" data-speed="3"><a-sphere position="1.0 0 0" radius="0.038" color="#98b0af" class="clickable" data-name="Oberon" data-info="Oberon is the outermost large moon of Uranus."></a-sphere></a-entity>
+      </a-entity>
+    </a-entity>
+    <a-ring radius-inner="17.19" radius-outer="17.21" rotation="-90 0 0" color="#4fc3f7" material="opacity: 0.25; side: double"></a-ring>
+
+    <!-- NEPTUNE + 1 MOON -->
+    <a-entity class="orbit" data-speed="0.006">
+      <a-entity position="19.5 0 0">
+        <a-sphere class="clickable" radius="0.4" color="#3D5AFE"
+          data-name="Neptune" data-info="The windiest planet - winds top 2,100 km/h! One orbit takes 165 Earth years."></a-sphere>
+        <a-entity class="orbit" data-speed="4"><a-sphere position="0.85 0 0" radius="0.05" color="#8a9bd4" class="clickable" data-name="Triton" data-info="Triton orbits Neptune backwards and has geysers of nitrogen."></a-sphere></a-entity>
+      </a-entity>
+    </a-entity>
+    <a-ring radius-inner="19.49" radius-outer="19.51" rotation="-90 0 0" color="#4fc3f7" material="opacity: 0.25; side: double"></a-ring>
+
   </a-entity>
 
-  <a-entity id="solarsystem" position="0 3 0"></a-entity>
-
-  <a-plane rotation="-90 0 0" width="150" height="150" position="0 -2 0" color="#080812" material="shader: flat"></a-plane>
+  <a-sky color="#000010"></a-sky>
 
 </a-scene>
 
 <script>
-/* Global error trap -> show on screen instead of silent blue screen */
-function showErr(msg) {
-  var e = document.getElementById('errbar');
-  if (e) { e.style.display = 'block'; e.textContent = 'Notice: ' + msg; }
-}
-window.addEventListener('error', function (ev) {
-  showErr((ev.message || 'script error') + (ev.lineno ? ' (line ' + ev.lineno + ')' : ''));
-});
+  // ---- Lesson content ----
+  var lessons = [
+    { t:'THE SOLAR SYSTEM', d:'8 planets and their moons orbit the Sun. Point at a planet and click (or pull the trigger in VR) to learn about it. Left stick to fly.' },
+    { t:'LESSON 1: ORBITS', d:'Planets closer to the Sun orbit faster. Mercury takes 88 days; Neptune takes 165 years.' },
+    { t:'LESSON 2: DAY & NIGHT', d:'As Earth spins, one side faces the Sun (day) and the other is dark (night). One spin = 24 hours.' },
+    { t:'LESSON 3: SEASONS', d:'Earth is tilted 23.5 degrees. As it orbits, each half leans toward or away from the Sun, giving us seasons.' },
+    { t:'LESSON 4: MOON PHASES', d:'As the Moon circles Earth every 29.5 days, we see different amounts of its sunlit half.' },
+    { t:'LESSON 5: TIDES', d:'The Moon\'s gravity pulls Earth\'s oceans into bulges - these are the high tides, twice a day.' },
+    { t:'LESSON 6: ECLIPSES', d:'A solar eclipse: the Moon blocks the Sun. A lunar eclipse: Earth\'s shadow falls on the Moon.' }
+  ];
 
-function rnd(a, b) { return a + Math.random() * (b - a); }
+  var speed = 1;
 
-var PLANETS = [
-  { id:'mercury', name:'Mercury', r:0.11, dist:4.2, spd:4.1, color:'#8B7355',
-    info:'Smallest planet, closest to the Sun. 430C by day, -180C at night. A day on Mercury lasts longer than its year!', moons:[] },
-  { id:'venus', name:'Venus', r:0.22, dist:5.6, spd:1.6, color:'#FFC649',
-    info:'Hottest planet at 465C! Wrapped in thick clouds of sulfuric acid. It spins backwards compared to the other planets.', moons:[] },
-  { id:'earth', name:'Earth', r:0.24, dist:7.2, spd:1.0, color:'#1E90FF',
-    info:'Our home - the only planet known to have life. 71% is covered in water. One trip around the Sun takes 365.25 days.',
-    moons:[ {name:'The Moon', r:0.07, dist:0.6, spd:6, color:'#C0C0C0'} ] },
-  { id:'mars', name:'Mars', r:0.16, dist:8.9, spd:0.53, color:'#C1440E',
-    info:'The Red Planet - rusty iron dust covers it. Home to Olympus Mons, the tallest volcano in the solar system.',
-    moons:[ {name:'Phobos', r:0.03, dist:0.32, spd:9, color:'#9e9e9e'}, {name:'Deimos', r:0.025, dist:0.45, spd:6, color:'#b0b0b0'} ] },
-  { id:'jupiter', name:'Jupiter', r:0.9, dist:11.5, spd:0.084, color:'#D9A066',
-    info:'The largest planet - 1,300 Earths could fit inside! Its Great Red Spot is a storm bigger than Earth.',
-    moons:[ {name:'Io', r:0.06, dist:1.2, spd:7, color:'#e8d16a'}, {name:'Europa', r:0.055, dist:1.45, spd:5, color:'#cfc0a8'},
-            {name:'Ganymede', r:0.08, dist:1.75, spd:3.5, color:'#9a8b78'}, {name:'Callisto', r:0.07, dist:2.05, spd:2.5, color:'#7a6f60'} ] },
-  { id:'saturn', name:'Saturn', r:0.75, dist:14.5, spd:0.034, color:'#E3C16F', rings:true,
-    info:'Famous for its stunning rings of ice and rock. It has 80+ moons - its moon Titan has rivers of liquid methane!',
-    moons:[ {name:'Titan', r:0.075, dist:1.6, spd:4, color:'#c9a15a'}, {name:'Rhea', r:0.045, dist:1.95, spd:2.8, color:'#b8b8b8'} ] },
-  { id:'uranus', name:'Uranus', r:0.42, dist:17.2, spd:0.012, color:'#7DE3E1',
-    info:'An ice giant that spins on its side - tilted 98 degrees, likely from an ancient collision. It has 27 known moons.',
-    moons:[ {name:'Titania', r:0.04, dist:0.8, spd:4, color:'#a8c4c3'}, {name:'Oberon', r:0.038, dist:1.0, spd:3, color:'#98b0af'} ] },
-  { id:'neptune', name:'Neptune', r:0.4, dist:19.5, spd:0.006, color:'#3D5AFE',
-    info:'The windiest planet - winds top 2,100 km/h! So far away that one orbit around the Sun takes 165 Earth years.',
-    moons:[ {name:'Triton', r:0.05, dist:0.85, spd:4, color:'#8a9bd4'} ] }
-];
-
-var scene = document.querySelector('a-scene');
-var solar = document.querySelector('#solarsystem');
-var spinners = [];
-var orbiters = [];
-
-function build() {
-  var sun = document.createElement('a-sphere');
-  sun.setAttribute('radius', 2.6);
-  sun.setAttribute('segments-height', 36);
-  sun.setAttribute('segments-width', 36);
-  sun.setAttribute('color', '#FFA500');
-  sun.setAttribute('material', 'emissive: #FF8800; emissiveIntensity: 0.9');
-  sun.setAttribute('class', 'clickable');
-  sun.dataset.name = 'The Sun';
-  sun.dataset.info = 'A giant ball of burning gas holding 99.8% of all mass in the solar system. 1.3 million Earths could fit inside. Core temperature: 15 million C.';
-  solar.appendChild(sun);
-  spinners.push({ el: sun, spd: 0.15 });
-
-  var glow = document.createElement('a-sphere');
-  glow.setAttribute('radius', 2.95);
-  glow.setAttribute('color', '#FF9800');
-  glow.setAttribute('material', 'opacity: 0.13; transparent: true; shader: flat; side: back');
-  solar.appendChild(glow);
-
-  PLANETS.forEach(function (p) {
-    var orbit = document.createElement('a-entity');
-    orbit.setAttribute('id', p.id + '-orbit');
-    solar.appendChild(orbit);
-    orbiters.push({ el: orbit, spd: p.spd });
-
-    var ring = document.createElement('a-ring');
-    ring.setAttribute('radius-inner', p.dist - 0.01);
-    ring.setAttribute('radius-outer', p.dist + 0.01);
-    ring.setAttribute('rotation', '90 0 0');
-    ring.setAttribute('color', '#4fc3f7');
-    ring.setAttribute('material', 'opacity: 0.25; transparent: true; shader: flat; side: double');
-    solar.appendChild(ring);
-
-    var holder = document.createElement('a-entity');
-    holder.setAttribute('position', p.dist + ' 0 0');
-    orbit.appendChild(holder);
-
-    var planet = document.createElement('a-sphere');
-    planet.setAttribute('radius', p.r);
-    planet.setAttribute('segments-height', 28);
-    planet.setAttribute('segments-width', 28);
-    planet.setAttribute('color', p.color);
-    planet.setAttribute('material', 'roughness: 0.85');
-    planet.setAttribute('class', 'clickable');
-    planet.dataset.name = p.name;
-    planet.dataset.info = p.info;
-    holder.appendChild(planet);
-    spinners.push({ el: planet, spd: 0.4 });
-
-    if (p.rings) {
-      // Thin flat ring around Saturn using a-ring primitive
-      var sr = document.createElement('a-ring');
-      sr.setAttribute('radius-inner', (p.r * 1.3).toFixed(3));
-      sr.setAttribute('radius-outer', (p.r * 2.1).toFixed(3));
-      sr.setAttribute('rotation', '75 0 0');
-      sr.setAttribute('color', '#F4E4A8');
-      sr.setAttribute('material', 'opacity: 0.75; transparent: true; side: double; shader: flat');
-      holder.appendChild(sr);
-    }
-
-    (p.moons || []).forEach(function (m) {
-      var moonOrbit = document.createElement('a-entity');
-      holder.appendChild(moonOrbit);
-      orbiters.push({ el: moonOrbit, spd: m.spd });
-
-      var moon = document.createElement('a-sphere');
-      moon.setAttribute('radius', m.r);
-      moon.setAttribute('segments-height', 14);
-      moon.setAttribute('segments-width', 14);
-      moon.setAttribute('position', m.dist + ' 0 0');
-      moon.setAttribute('color', m.color);
-      moon.setAttribute('material', 'roughness: 0.95');
-      moon.setAttribute('class', 'clickable');
-      moon.dataset.name = m.name;
-      moon.dataset.info = m.name + ' is a moon of ' + p.name + '.';
-      moonOrbit.appendChild(moon);
-      spinners.push({ el: moon, spd: 0.6 });
-    });
-  });
-
-  var sf = document.querySelector('#starfield');
-  var frag = document.createDocumentFragment();
-  for (var i = 0; i < 300; i++) {
-    var s = document.createElement('a-sphere');
-    s.setAttribute('position', rnd(-90,90).toFixed(1) + ' ' + rnd(-90,90).toFixed(1) + ' ' + rnd(-90,90).toFixed(1));
-    s.setAttribute('radius', rnd(0.03, 0.14).toFixed(2));
-    s.setAttribute('color', '#ffffff');
-    s.setAttribute('material', 'shader: flat');
-    frag.appendChild(s);
+  function setLesson(n) {
+    var l = lessons[n];
+    document.getElementById('title').textContent = l.t;
+    document.getElementById('desc').textContent = l.d;
+    var btns = document.querySelectorAll('#header button');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('active', i === n);
+    var vt = document.getElementById('vrTitle'); if (vt) vt.setAttribute('value', l.t);
+    var vd = document.getElementById('vrDesc'); if (vd) vd.setAttribute('value', l.d);
   }
-  sf.appendChild(frag);
-}
 
-/* Safe VR joystick locomotion — guarded so it can never throw and blank the scene */
-AFRAME.registerComponent('locomotion', {
-  init: function () {
-    var self = this;
-    this.mv = { x: 0, y: 0 };
-    this.snap = true;
-    function bind() {
-      var L = document.querySelector('#leftHand');
-      var R = document.querySelector('#rightHand');
-      if (L) L.addEventListener('thumbstickmoved', function (e) { self.mv.x = e.detail.x; self.mv.y = e.detail.y; });
-      if (R) R.addEventListener('thumbstickmoved', function (e) {
-        var x = e.detail.x;
-        if (Math.abs(x) < 0.3) self.snap = true;
-        else if (self.snap && Math.abs(x) > 0.7) {
-          self.snap = false;
-          var r = self.el.getAttribute('rotation');
-          self.el.setAttribute('rotation', { x: r.x, y: r.y - Math.sign(x) * 45, z: r.z });
+  function changeSpeed(d) {
+    speed = Math.max(0.1, Math.min(3, Math.round((speed + d) * 10) / 10));
+    document.getElementById('speedNum').textContent = speed.toFixed(1) + 'x';
+  }
+
+  // ---- Build VR menu buttons + stars, and wire everything after scene loads ----
+  window.addEventListener('load', function () {
+    var scene = document.querySelector('a-scene');
+
+    function ready() {
+      // Stars
+      var stars = document.querySelector('#stars');
+      for (var i = 0; i < 250; i++) {
+        var s = document.createElement('a-sphere');
+        var x = (Math.random()-0.5)*140, y = (Math.random()-0.5)*140, z = (Math.random()-0.5)*140;
+        s.setAttribute('position', x.toFixed(1)+' '+y.toFixed(1)+' '+z.toFixed(1));
+        s.setAttribute('radius', (Math.random()*0.1+0.03).toFixed(2));
+        s.setAttribute('color', '#ffffff');
+        stars.appendChild(s);
+      }
+
+      // VR menu buttons
+      var box = document.querySelector('#vrMenuBtns');
+      for (var j = 0; j < lessons.length; j++) {
+        (function (idx) {
+          var y = 2.2 - idx * 0.75;
+          var b = document.createElement('a-plane');
+          b.setAttribute('class', 'clickable');
+          b.setAttribute('width', 4.2);
+          b.setAttribute('height', 0.6);
+          b.setAttribute('position', '0 ' + y + ' 0.01');
+          b.setAttribute('color', idx === 0 ? '#ffca28' : '#1c3a5e');
+          b.dataset.lesson = idx;
+          var t = document.createElement('a-text');
+          t.setAttribute('value', lessons[idx].t.replace('LESSON ','').replace('THE ',''));
+          t.setAttribute('color', idx === 0 ? '#001a33' : '#fff');
+          t.setAttribute('align', 'center');
+          t.setAttribute('width', 5);
+          t.setAttribute('position', '0 0 0.01');
+          b.appendChild(t);
+          box.appendChild(b);
+        })(j);
+      }
+
+      // Click handling for planets + menu
+      scene.addEventListener('click', function (e) {
+        var el = e.target;
+        if (!el.dataset) return;
+        if (el.dataset.lesson !== undefined) {
+          setLesson(parseInt(el.dataset.lesson));
+          // recolor menu
+          var mbtns = box.querySelectorAll('a-plane');
+          for (var k = 0; k < mbtns.length; k++) {
+            var on = parseInt(mbtns[k].dataset.lesson) === parseInt(el.dataset.lesson);
+            mbtns[k].setAttribute('color', on ? '#ffca28' : '#1c3a5e');
+            var txt = mbtns[k].querySelector('a-text');
+            if (txt) txt.setAttribute('color', on ? '#001a33' : '#fff');
+          }
+        } else if (el.dataset.name) {
+          document.getElementById('title').textContent = el.dataset.name;
+          document.getElementById('desc').textContent = el.dataset.info;
+          var vt = document.getElementById('vrTitle'); if (vt) vt.setAttribute('value', el.dataset.name.toUpperCase());
+          var vd = document.getElementById('vrDesc'); if (vd) vd.setAttribute('value', el.dataset.info);
         }
       });
-    }
-    bind();
-    scene.addEventListener('controllerconnected', bind);
-  },
-  tick: function (t, dt) {
-    try {
-      if (Math.abs(this.mv.x) < 0.12 && Math.abs(this.mv.y) < 0.12) return;
-      var head = document.querySelector('#head');
-      if (!head || !head.object3D) return;
-      var q = head.object3D.getWorldQuaternion(new THREE.Quaternion());
-      var dir = new THREE.Vector3(this.mv.x, 0, this.mv.y).applyQuaternion(q);
-      dir.y = 0;
-      var mag = Math.hypot(this.mv.x, this.mv.y);
-      if (dir.lengthSq() > 0) {
-        dir.normalize().multiplyScalar(7 * (dt / 1000) * mag);
-        this.el.object3D.position.x += dir.x;
-        this.el.object3D.position.z += dir.z;
-      }
-    } catch (err) { /* never let movement crash the render loop */ }
-  }
-});
 
-var lessons = [
-  { title:'THE SOLAR SYSTEM', short:'Solar System',
-    desc:'8 planets and their moons orbit the Sun. Point at anything to see its name; click or trigger for facts. Left stick = fly!' },
-  { title:'LESSON 1: ORBITS', short:'1. Orbits',
-    desc:'Planets closer to the Sun orbit faster. Mercury takes 88 days; Neptune takes 165 years. Watch the inner planets race around!' },
-  { title:'LESSON 2: DAY & NIGHT', short:'2. Day & Night',
-    desc:'As Earth spins, one side faces the Sun (day) while the other is dark (night). One full spin = 24 hours. Fly close and watch!' },
-  { title:'LESSON 3: SEASONS', short:'3. Seasons',
-    desc:'Earth is tilted 23.5 degrees. As it orbits, each hemisphere leans toward or away from the Sun, giving us summer and winter.' },
-  { title:'LESSON 4: MOON PHASES', short:'4. Moon Phases',
-    desc:'As the Moon circles Earth every 29.5 days, we see different amounts of its sunlit half - new, crescent, half, gibbous, full.' },
-  { title:'LESSON 5: TIDES', short:'5. Tides',
-    desc:'The Moon gravity pulls Earth oceans into bulges on the near and far sides - these are the high tides, twice a day.' },
-  { title:'LESSON 6: ECLIPSES', short:'6. Eclipses',
-    desc:'Solar eclipse: the Moon blocks the Sun. Lunar eclipse: Earth shadow falls on the Moon. Both need Sun, Earth & Moon in a line.' }
-];
-
-var currentLesson = 0;
-var speed = 1;
-
-function buildVRMenu() {
-  var c = document.querySelector('#vrMenuButtons');
-  lessons.forEach(function (l, i) {
-    var y = 2.5 - i * 0.8;
-    var b = document.createElement('a-plane');
-    b.setAttribute('class', 'clickable vrbtn');
-    b.dataset.action = 'lesson';
-    b.dataset.lesson = i;
-    b.setAttribute('width', 4.6);
-    b.setAttribute('height', 0.64);
-    b.setAttribute('position', '0 ' + y + ' 0');
-    b.setAttribute('color', i === 0 ? '#ffca28' : '#1c3a5e');
-    b.setAttribute('material', 'shader: flat');
-    var t = document.createElement('a-text');
-    t.setAttribute('value', l.short);
-    t.setAttribute('color', i === 0 ? '#001a33' : '#e0e0e0');
-    t.setAttribute('align', 'center');
-    t.setAttribute('width', 5.5);
-    t.setAttribute('position', '0 0 0.01');
-    b.appendChild(t);
-    c.appendChild(b);
-  });
-}
-
-function highlightVR(n) {
-  document.querySelectorAll('#vrMenuButtons .vrbtn').forEach(function (b) {
-    var i = +b.dataset.lesson;
-    b.setAttribute('color', i === n ? '#ffca28' : '#1c3a5e');
-    var t = b.querySelector('a-text');
-    if (t) t.setAttribute('color', i === n ? '#001a33' : '#e0e0e0');
-  });
-}
-
-function setLesson(n) {
-  currentLesson = n;
-  var l = lessons[n];
-  document.querySelector('#title').innerHTML = l.title;
-  document.querySelector('#description').innerHTML = l.desc;
-  document.querySelectorAll('.nav-btn').forEach(function (b, i) { b.classList.toggle('active', i === n); });
-  var vt = document.querySelector('#vrInfoTitle'); if (vt) vt.setAttribute('value', l.title);
-  var vb = document.querySelector('#vrInfoBody'); if (vb) vb.setAttribute('value', l.desc);
-  highlightVR(n);
-}
-window.setLesson = setLesson;
-
-function showInfo(name, info) {
-  document.querySelector('#title').innerHTML = name;
-  document.querySelector('#description').innerHTML = info;
-  var vt = document.querySelector('#vrInfoTitle'); if (vt) vt.setAttribute('value', name.toUpperCase());
-  var vb = document.querySelector('#vrInfoBody'); if (vb) vb.setAttribute('value', info);
-}
-
-function changeSpeed(d) {
-  speed = Math.max(0.1, Math.min(3, +(speed + d).toFixed(1)));
-  document.querySelector('#speedNum').textContent = speed.toFixed(1) + 'x';
-  var sl = document.querySelector('#vrSpeedLabel'); if (sl) sl.setAttribute('value', 'Orbit Speed: ' + speed.toFixed(1) + 'x');
-}
-window.changeSpeed = changeSpeed;
-
-function attachEvents() {
-  scene.addEventListener('click', function (e) {
-    var el = e.target;
-    if (!el.classList) return;
-    if (el.classList.contains('vrbtn')) {
-      var a = el.dataset.action;
-      if (a === 'lesson') setLesson(+el.dataset.lesson);
-      if (a === 'speed-up') changeSpeed(0.3);
-      if (a === 'speed-down') changeSpeed(-0.3);
-      return;
-    }
-    if (el.classList.contains('clickable') && el.dataset.name) {
-      showInfo(el.dataset.name, el.dataset.info);
-    }
-  });
-
-  var hoverLabel = document.querySelector('#hoverLabel');
-  var hoverText = document.querySelector('#hoverText');
-  scene.addEventListener('mouseenter', function (e) {
-    var el = e.target;
-    if (el.classList && el.classList.contains('clickable') && el.dataset.name) {
-      hoverText.setAttribute('value', el.dataset.name);
-      hoverLabel.setAttribute('visible', true);
-      hoverLabel._target = el;
-    }
-  });
-  scene.addEventListener('mouseleave', function (e) {
-    if (hoverLabel._target === e.target) {
-      hoverLabel.setAttribute('visible', false);
-      hoverLabel._target = null;
-    }
-  });
-}
-
-function setupCursorVisibility() {
-  var cursor = document.querySelector('#cursor');
-  scene.addEventListener('enter-vr', function () { if (cursor) cursor.setAttribute('visible', false); });
-  scene.addEventListener('exit-vr', function () { if (cursor) cursor.setAttribute('visible', true); });
-}
-
-/* Animation runs as an A-Frame tick component so it works on desktop AND in VR.
-   (requestAnimationFrame is paused by the browser once a headset session starts;
-   A-Frame's tick runs inside the active render loop in both modes.) */
-AFRAME.registerComponent('orbit-animator', {
-  init: function () {
-    this.frames = 0;
-  },
-  tick: function (time, dt) {
-    try {
-      this.frames++;
-      if (!dt) return;
-      var step = Math.min(dt, 100) / 16.67;
-
-      for (var i = 0; i < orbiters.length; i++) {
-        var o = orbiters[i];
-        o._a = (o._a || 0) + o.spd * 0.35 * speed * step;
-        if (o.el.object3D) o.el.object3D.rotation.y = THREE.MathUtils.degToRad(o._a);
-      }
-      for (var j = 0; j < spinners.length; j++) {
-        var s = spinners[j];
-        s._a = (s._a || 0) + s.spd * speed * step;
-        if (s.el.object3D) s.el.object3D.rotation.y = THREE.MathUtils.degToRad(s._a);
-      }
-
-      // Diagnostic: update a tiny frame counter on the menu board every 30 frames
-      if (this.frames % 30 === 0) {
-        var dbg = document.querySelector('#vrDebug');
-        if (dbg) dbg.setAttribute('value', 'frames: ' + this.frames + '  speed: ' + speed.toFixed(1) + 'x');
-      }
-
-      var hoverLabel = document.querySelector('#hoverLabel');
-      if (hoverLabel && hoverLabel._target && hoverLabel._target.object3D) {
-        var wp = new THREE.Vector3();
-        hoverLabel._target.object3D.getWorldPosition(wp);
-        hoverLabel.object3D.position.set(wp.x, wp.y + 0.9, wp.z);
-        var camEl = document.querySelector('#head');
-        if (camEl && camEl.object3D) {
-          hoverLabel.object3D.lookAt(camEl.object3D.getWorldPosition(new THREE.Vector3()));
+      // Animate orbits + spins using A-Frame's tick (works in VR too)
+      AFRAME.registerComponent('spinner', {
+        tick: function (time, dt) {
+          if (!dt) return;
+          var step = Math.min(dt, 100) / 16.67;
+          var orbits = document.querySelectorAll('.orbit');
+          for (var i = 0; i < orbits.length; i++) {
+            var sp = parseFloat(orbits[i].dataset.speed) || 0;
+            var a = (parseFloat(orbits[i].dataset.angle) || 0) + sp * 0.35 * speed * step;
+            orbits[i].dataset.angle = a;
+            orbits[i].object3D.rotation.y = a * Math.PI / 180;
+          }
         }
-      }
-    } catch (err) { showErr('tick: ' + err.message); }
-  }
-});
+      });
+      scene.setAttribute('spinner', '');
+    }
 
-function init() {
-  try {
-    build();
-    buildVRMenu();
-    attachEvents();
-    setupCursorVisibility();
-    document.querySelector('#rig').setAttribute('locomotion', '');
-    setLesson(0);
-    // Attach the animator to the scene so it ticks in desktop and VR
-    scene.setAttribute('orbit-animator', '');
-  } catch (err) {
-    showErr('init failed: ' + err.message);
-  }
-}
-
-if (scene.hasLoaded) { init(); }
-else { scene.addEventListener('loaded', init); }
+    if (scene.hasLoaded) ready();
+    else scene.addEventListener('loaded', ready);
+  });
 </script>
+
 </body>
 </html>
